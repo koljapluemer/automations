@@ -20,6 +20,10 @@ automations:
     enabled: true
     vault_path: "/home/you/obsidian-vault"
 
+  unedited_kindle_notes:
+    enabled: true
+    vault_path: "/home/you/obsidian-vault"
+
   wallpaper_from_report:
     enabled: true
     # output_image: "output/wallpaper.png"
