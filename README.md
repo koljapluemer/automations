@@ -30,3 +30,13 @@ For GNOME wallpaper updates, `gsettings` comes with GNOME. Make sure you are run
 - Per-automation logs are stored in `runtime/logs/YYYY-MM-DD/`.
 - Use `uv run automations --list` to see available automations.
 - The wallpaper automation needs `wkhtmltoimage` or `chromium`/`google-chrome` installed for HTML rendering.
+
+## Manual runs
+
+Run just the portfolio publisher automation:
+
+```bash
+uv run automations --only publish_portfolio_from_obs
+```
+
+Ensure `publish_portfolio_from_obs` is enabled in `config.yaml` when running it manually.

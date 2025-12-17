@@ -26,3 +26,6 @@ automations:
     # renderer: "auto"  # auto, wkhtmltoimage, chromium, google-chrome
     # picture_options: "zoom" # zoom, scaled, centered, stretched, spanned
     set_wallpaper: true
+
+  publish_portfolio_from_obs:
+    enabled: true
