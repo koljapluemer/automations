@@ -1,0 +1,7 @@
+# Copy to config.yaml and fill in your own values.
+obsidian-vault-path: "/home/you/obsidian-vault"
+github-username: "your-username"
+github-token: "ghp_yourtoken"
+# Optional
+screen-width: 2560
+screen-height: 1600

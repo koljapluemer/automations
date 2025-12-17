@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+src/automations/__init__.py
+src/automations/__main__.py
+src/automations/cli.py
+src/automations/config.py
+src/automations/log_store.py
+src/automations/runner.py
+src/automations.egg-info/PKG-INFO
+src/automations.egg-info/SOURCES.txt
+src/automations.egg-info/dependency_links.txt
+src/automations.egg-info/entry_points.txt
+src/automations.egg-info/requires.txt
+src/automations.egg-info/top_level.txt
+src/automations/report/html.py
+src/automations/services/github.py
+src/automations/services/obsidian.py

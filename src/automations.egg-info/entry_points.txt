@@ -1,0 +1,2 @@
+[console_scripts]
+automations = automations.cli:main

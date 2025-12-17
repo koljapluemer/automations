@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: automations
+Version: 0.1.0
+Summary: Personal automations
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: requests>=2.31
+
+# automations
+
+Personal automation runner.
+
+## Quick start
+
+- Copy `config.yaml.demo` to `config.yaml` and fill in values.
+- Run with `uv run automations`.
