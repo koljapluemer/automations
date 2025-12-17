@@ -19,3 +19,10 @@ automations:
   obsidian_md_count:
     enabled: true
     vault_path: "/home/you/obsidian-vault"
+
+  wallpaper_from_report:
+    enabled: true
+    # output_image: "output/wallpaper.png"
+    # renderer: "auto"  # auto, wkhtmltoimage, chromium, google-chrome
+    # picture_options: "zoom" # zoom, scaled, centered, stretched, spanned
+    set_wallpaper: true

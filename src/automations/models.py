@@ -11,6 +11,7 @@ class AutomationSpec:
     title: str
     description: str
     default_enabled: bool = True
+    stage: str = "primary"
 
 
 AutomationStatus = Literal["ok", "skipped", "error"]

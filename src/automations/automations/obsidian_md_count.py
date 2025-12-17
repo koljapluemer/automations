@@ -47,10 +47,10 @@ class ObsidianMarkdownCountAutomation(Automation):
 
 
 def _resolve_vault_path(config: dict[str, Any], ctx: AutomationContext) -> Path:
-    path_raw = config.get("vault_path") or config.get("obsidian-vault-path")
+    path_raw = config.get("vault_path")
     if not path_raw:
         service_cfg = ctx.services.service_config("obsidian")
-        path_raw = service_cfg.get("vault_path") or service_cfg.get("obsidian-vault-path")
+        path_raw = service_cfg.get("vault_path")
     if not path_raw:
         raise ValueError("obsidian_md_count requires 'vault_path' in config or services")
     return Path(str(path_raw)).expanduser()

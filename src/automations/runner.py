@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+from pathlib import Path
 
 from .config import AppConfig
 from .context import AutomationContext
@@ -30,13 +31,15 @@ def run_automations(
     )
 
     automations = load_automations()
+    primary = [automation for automation in automations if automation.spec.stage == "primary"]
+    post_report = [automation for automation in automations if automation.spec.stage == "post_report"]
     _safe_log_run(log, "run_start", {"run_id": run_id, "automation_count": len(automations)})
 
     results: list[AutomationResult] = []
     report_elements = []
     warnings: list[str] = []
 
-    for automation in automations:
+    for automation in primary:
         result = _run_single(automation, ctx, only=only, skip=skip)
         results.append(result)
         report_elements.extend(automation.build_report(result))
@@ -46,6 +49,21 @@ def run_automations(
     report_path = _write_report(config, report_elements, warnings)
     if not report_path:
         warnings.append("Report generation failed; see run log for details")
+    else:
+        ctx = AutomationContext(
+            config=config,
+            services=services,
+            log=log,
+            run_date=run_date,
+            run_id=run_id,
+            report_path=report_path,
+        )
+
+    for automation in post_report:
+        result = _run_single(automation, ctx, only=only, skip=skip)
+        results.append(result)
+        if result.status == "error" and result.message:
+            warnings.append(f"{result.automation_id}: {result.message}")
 
     _safe_log_run(
         log,
@@ -59,7 +77,7 @@ def run_automations(
 
     return RunSummary(
         results=tuple(results),
-        report_path=report_path,
+        report_path=str(report_path) if report_path else None,
         warnings=tuple(warnings),
     )
 
@@ -131,7 +149,7 @@ def _log_result(log: LogWriter, result: AutomationResult) -> None:
     _safe_log_run(log, "automation_result", {"automation_id": result.automation_id, **payload})
 
 
-def _write_report(config: AppConfig, elements: list, warnings: list[str]) -> str | None:
+def _write_report(config: AppConfig, elements: list, warnings: list[str]) -> Path | None:
     report = ReportModel(
         elements=elements,
         generated_at=datetime.now(),
@@ -145,7 +163,7 @@ def _write_report(config: AppConfig, elements: list, warnings: list[str]) -> str
         config.report.output_html.write_text(html, encoding="utf-8")
     except Exception:
         return None
-    return str(config.report.output_html)
+    return config.report.output_html
 
 
 def _safe_log(callable_, *args) -> None:
