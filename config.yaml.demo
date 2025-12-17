@@ -1,7 +1,21 @@
 # Copy to config.yaml and fill in your own values.
-obsidian-vault-path: "/home/you/obsidian-vault"
-github-username: "your-username"
-github-token: "ghp_yourtoken"
-# Optional
-screen-width: 2560
-screen-height: 1600
+services:
+  github:
+    username: "your-username"
+    token: "ghp_yourtoken"
+
+report:
+  screen_width: 2560
+  screen_height: 1600
+  # output_html: "output/stats.html"
+
+logging:
+  # root: "runtime/logs"
+
+automations:
+  github_repo_count:
+    enabled: true
+
+  obsidian_md_count:
+    enabled: true
+    vault_path: "/home/you/obsidian-vault"

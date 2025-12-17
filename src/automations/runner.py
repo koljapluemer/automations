@@ -1,140 +1,159 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date, datetime
-from pathlib import Path
-from typing import Any
 
-from .config import Config
-from .log_store import LogStore
-from .report.html import render_stats_html
-from .services.github import GitHubClient
-from .services.obsidian import count_markdown_files
-
-
-@dataclass(frozen=True)
-class AutomationError:
-    step: str
-    message: str
+from .config import AppConfig
+from .context import AutomationContext
+from .logging.log_writer import LogWriter
+from .models import AutomationResult, ReportModel, RunSummary
+from .registry import load_automations
+from .report.html import render_report
+from .services.registry import ServiceRegistry
 
 
-@dataclass(frozen=True)
-class AutomationResult:
-    repo_count: int | None
-    md_count: int | None
-    html_path: Path | None
-    errors: tuple[AutomationError, ...]
+def run_automations(
+    config: AppConfig,
+    only: set[str] | None = None,
+    skip: set[str] | None = None,
+) -> RunSummary:
+    run_date = date.today()
+    run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
 
+    log = LogWriter(config.logging.root, run_date, run_id)
+    services = ServiceRegistry(config.services)
+    ctx = AutomationContext(
+        config=config,
+        services=services,
+        log=log,
+        run_date=run_date,
+        run_id=run_id,
+    )
 
-def run_automations(config: Config) -> AutomationResult:
-    project_root = config.output_html.parent.parent
-    log_store = LogStore(project_root / "runtime" / "automation.log.jsonl")
-    errors: list[AutomationError] = []
+    automations = load_automations()
+    _safe_log_run(log, "run_start", {"run_id": run_id, "automation_count": len(automations)})
 
-    md_count: int | None = None
-    try:
-        md_count = count_markdown_files(config.obsidian_vault_path)
-        _safe_log(
-            log_store,
-            errors,
-            "obsidian_md_count",
-            {"count": md_count, "vault": str(config.obsidian_vault_path)},
-        )
-    except Exception as exc:
-        _record_error(log_store, errors, "obsidian_md_count", exc)
+    results: list[AutomationResult] = []
+    report_elements = []
+    warnings: list[str] = []
 
-    repo_count: int | None = None
-    try:
-        repo_count = _get_repo_count(config, log_store, errors)
-    except Exception as exc:
-        _record_error(log_store, errors, "github_repo_count", exc)
+    for automation in automations:
+        result = _run_single(automation, ctx, only=only, skip=skip)
+        results.append(result)
+        report_elements.extend(automation.build_report(result))
+        if result.status == "error" and result.message:
+            warnings.append(f"{result.automation_id}: {result.message}")
 
-    html_path: Path | None = None
-    try:
-        html = render_stats_html(
-            repo_count=repo_count,
-            md_count=md_count,
-            screen_width=config.screen_width,
-            screen_height=config.screen_height,
-            generated_at=datetime.now(),
-            error_count=len(errors),
-        )
-        config.output_html.parent.mkdir(parents=True, exist_ok=True)
-        config.output_html.write_text(html, encoding="utf-8")
-        html_path = config.output_html
+    report_path = _write_report(config, report_elements, warnings)
+    if not report_path:
+        warnings.append("Report generation failed; see run log for details")
 
-        _safe_log(
-            log_store,
-            errors,
-            "html_generated",
-            {
-                "output_path": str(config.output_html),
-                "repo_count": repo_count,
-                "md_count": md_count,
-                "error_count": len(errors),
-            },
-        )
-    except Exception as exc:
-        _record_error(log_store, errors, "html_generated", exc)
+    _safe_log_run(
+        log,
+        "run_complete",
+        {
+            "run_id": run_id,
+            "report_path": report_path,
+            "warnings": warnings,
+        },
+    )
 
-    return AutomationResult(
-        repo_count=repo_count,
-        md_count=md_count,
-        html_path=html_path,
-        errors=tuple(errors),
+    return RunSummary(
+        results=tuple(results),
+        report_path=report_path,
+        warnings=tuple(warnings),
     )
 
 
+def _run_single(automation, ctx: AutomationContext, only: set[str] | None, skip: set[str] | None) -> AutomationResult:
+    automation_id = automation.spec.id
 
-def _get_repo_count(
-    config: Config,
-    log_store: LogStore,
-    errors: list[AutomationError],
-) -> int:
-    today = date.today()
-    existing = log_store.latest_for_date("github_repo_count", today)
-    if existing:
-        cached = existing.payload.get("count")
-        if isinstance(cached, int):
-            return cached
-        if isinstance(cached, str) and cached.isdigit():
-            return int(cached)
+    if only and automation_id not in only:
+        result = AutomationResult(
+            automation_id=automation_id,
+            status="skipped",
+            message="Not selected",
+        )
+        _log_result(ctx.log, result)
+        return result
 
-    client = GitHubClient(token=config.github_token, username=config.github_username)
-    result = client.count_owned_repos()
-    _safe_log(
-        log_store,
-        errors,
-        "github_repo_count",
-        {"count": result.count, "username": config.github_username},
-    )
-    return result.count
+    if skip and automation_id in skip:
+        result = AutomationResult(
+            automation_id=automation_id,
+            status="skipped",
+            message="Skipped by user",
+        )
+        _log_result(ctx.log, result)
+        return result
 
+    settings = ctx.settings_for(automation_id, default_enabled=automation.spec.default_enabled)
+    if not settings.enabled:
+        result = AutomationResult(
+            automation_id=automation_id,
+            status="skipped",
+            message="Disabled in config",
+        )
+        _log_result(ctx.log, result)
+        return result
 
-def _record_error(
-    log_store: LogStore,
-    errors: list[AutomationError],
-    step: str,
-    exc: Exception,
-) -> None:
-    message = f"{type(exc).__name__}: {exc}"
-    _safe_log(
-        log_store,
-        errors,
-        "automation_error",
-        {"step": step, "error": message, "error_type": type(exc).__name__},
-    )
-    errors.append(AutomationError(step=step, message=message))
-
-
-def _safe_log(
-    log_store: LogStore,
-    errors: list[AutomationError],
-    event: str,
-    payload: dict[str, Any],
-) -> None:
+    started_at = datetime.now()
     try:
-        log_store.append(event, payload)
+        payload = automation.run(ctx)
+        status = "ok"
+        message = None
     except Exception as exc:
+        payload = {}
+        status = "error"
         message = f"{type(exc).__name__}: {exc}"
-        errors.append(AutomationError(step="log_store", message=message))
+    finished_at = datetime.now()
+
+    result = AutomationResult(
+        automation_id=automation_id,
+        status=status,
+        payload=payload,
+        message=message,
+        started_at=started_at,
+        finished_at=finished_at,
+    )
+    _log_result(ctx.log, result)
+    return result
+
+
+def _log_result(log: LogWriter, result: AutomationResult) -> None:
+    payload = {
+        "status": result.status,
+        "payload": result.payload,
+        "message": result.message,
+        "started_at": result.started_at.isoformat(timespec="seconds") if result.started_at else None,
+        "finished_at": result.finished_at.isoformat(timespec="seconds") if result.finished_at else None,
+        "duration_ms": result.duration_ms(),
+    }
+    _safe_log(log.append, result.automation_id, "result", payload)
+    _safe_log_run(log, "automation_result", {"automation_id": result.automation_id, **payload})
+
+
+def _write_report(config: AppConfig, elements: list, warnings: list[str]) -> str | None:
+    report = ReportModel(
+        elements=elements,
+        generated_at=datetime.now(),
+        screen_width=config.report.screen_width,
+        screen_height=config.report.screen_height,
+        warnings=warnings,
+    )
+    html = render_report(report)
+    try:
+        config.report.output_html.parent.mkdir(parents=True, exist_ok=True)
+        config.report.output_html.write_text(html, encoding="utf-8")
+    except Exception:
+        return None
+    return str(config.report.output_html)
+
+
+def _safe_log(callable_, *args) -> None:
+    try:
+        callable_(*args)
+    except Exception:
+        return
+
+
+def _safe_log_run(log: LogWriter, event: str, payload: dict) -> None:
+    _safe_log(log.append_run, event, payload)

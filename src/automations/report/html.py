@@ -1,34 +1,21 @@
 from __future__ import annotations
 
-from datetime import datetime
+from ..models import ReportElement, ReportModel
 
 
-def render_stats_html(
-    repo_count: int | None,
-    md_count: int | None,
-    screen_width: int,
-    screen_height: int,
-    generated_at: datetime | None = None,
-    error_count: int = 0,
-) -> str:
-    timestamp = (generated_at or datetime.now()).strftime("%Y-%m-%d %H:%M")
-    repo_value = str(repo_count) if repo_count is not None else "N/A"
-    md_value = str(md_count) if md_count is not None else "N/A"
-    repo_note = (
-        "Owned and tracked"
-        if repo_count is not None
-        else "Unavailable (see log)"
-    )
-    md_note = "Markdown notes" if md_count is not None else "Unavailable (see log)"
+def render_report(model: ReportModel) -> str:
+    timestamp = model.generated_at.strftime("%Y-%m-%d %H:%M")
     warning_html = ""
-    if error_count:
+    if model.warnings:
         warning_html = f"""
         <div class=\"mt-10 rounded-2xl border border-amber-200/70 bg-amber-50/70 px-6 py-4 text-sm text-amber-900\">
           <p class=\"text-xs font-semibold uppercase tracking-[0.3em] text-amber-700\">Attention</p>
-          <p class=\"mt-2 text-base font-semibold\">Partial data available ({error_count} issue(s))</p>
-          <p class=\"mt-1 text-amber-800/80\">Review runtime/automation.log.jsonl for details.</p>
+          <p class=\"mt-2 text-base font-semibold\">Partial data available ({len(model.warnings)} issue(s))</p>
+          <p class=\"mt-1 text-amber-800/80\">Review runtime logs for details.</p>
         </div>
         """
+
+    elements_html = "\n".join(_render_element(element) for element in model.elements)
 
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
@@ -45,8 +32,8 @@ def render_stats_html(
     <script src=\"https://cdn.tailwindcss.com\"></script>
     <style>
       :root {{
-        --screen-width: {screen_width}px;
-        --screen-height: {screen_height}px;
+        --screen-width: {model.screen_width}px;
+        --screen-height: {model.screen_height}px;
         --ink: #0b0f1a;
         --mist: #e6ecef;
         --accent: #f3b34c;
@@ -106,6 +93,16 @@ def render_stats_html(
         line-height: 1;
       }}
 
+      .panel-error {{
+        border-color: rgba(244, 63, 94, 0.4);
+        background: rgba(255, 228, 230, 0.6);
+      }}
+
+      .panel-warn {{
+        border-color: rgba(245, 158, 11, 0.4);
+        background: rgba(254, 243, 199, 0.7);
+      }}
+
       @keyframes floatIn {{
         0% {{
           opacity: 0;
@@ -152,22 +149,8 @@ def render_stats_html(
           </div>
         </header>
 
-        <section class=\"mt-14 grid grid-cols-2 gap-10\">
-          <div class=\"glass-panel stat-card\" style=\"animation-delay: 120ms;\">
-            <p class=\"stat-label text-slate-500\">GitHub Repos</p>
-            <div class=\"mt-6 flex items-end justify-between\">
-              <span class=\"stat-value text-slate-900\">{repo_value}</span>
-              <span class=\"text-sm text-slate-500\">{repo_note}</span>
-            </div>
-          </div>
-
-          <div class=\"glass-panel stat-card\" style=\"animation-delay: 240ms;\">
-            <p class=\"stat-label text-slate-500\">Obsidian Vault</p>
-            <div class=\"mt-6 flex items-end justify-between\">
-              <span class=\"stat-value text-slate-900\">{md_value}</span>
-              <span class=\"text-sm text-slate-500\">{md_note}</span>
-            </div>
-          </div>
+        <section class=\"mt-14 grid grid-cols-2 gap-10 auto-rows-[1fr]\">
+          {elements_html}
         </section>
 
         {warning_html}
@@ -175,7 +158,7 @@ def render_stats_html(
         <footer class=\"mt-auto flex items-end justify-between text-sm text-slate-500\">
           <div>
             <p class=\"uppercase tracking-[0.3em]\">Screen</p>
-            <p class=\"mt-2 text-base font-semibold text-slate-800\">{screen_width} x {screen_height}</p>
+            <p class=\"mt-2 text-base font-semibold text-slate-800\">{model.screen_width} x {model.screen_height}</p>
           </div>
           <div class=\"text-right\">
             <p class=\"uppercase tracking-[0.3em]\">Next step</p>
@@ -187,3 +170,41 @@ def render_stats_html(
   </body>
 </html>
 """
+
+
+def _render_element(element: ReportElement) -> str:
+    col_span = max(1, int(element.col_span))
+    row_span = max(1, int(element.row_span))
+    style = f"grid-column: span {col_span}; grid-row: span {row_span};"
+    status_class = ""
+    if element.status == "error":
+        status_class = " panel-error"
+    elif element.status == "warn":
+        status_class = " panel-warn"
+
+    if element.kind == "image":
+        src = element.data.get("src")
+        alt = element.data.get("alt") or element.title or ""
+        if src:
+            return f"""
+            <div class=\"glass-panel stat-card{status_class}\" style=\"{style}\">
+              <p class=\"stat-label text-slate-500\">{element.title or "Image"}</p>
+              <div class=\"mt-6 flex h-full items-center justify-center\">
+                <img src=\"{src}\" alt=\"{alt}\" class=\"max-h-full max-w-full rounded-2xl\" />
+              </div>
+            </div>
+            """
+
+    title = element.title or "Untitled"
+    value = element.value or "N/A"
+    note = element.note or ""
+
+    return f"""
+    <div class=\"glass-panel stat-card{status_class}\" style=\"{style}\">
+      <p class=\"stat-label text-slate-500\">{title}</p>
+      <div class=\"mt-6 flex items-end justify-between\">
+        <span class=\"stat-value text-slate-900\">{value}</span>
+        <span class=\"text-sm text-slate-500\">{note}</span>
+      </div>
+    </div>
+    """

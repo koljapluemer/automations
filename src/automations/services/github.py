@@ -16,8 +16,16 @@ class GitHubClient:
     def __init__(self, token: str, username: str) -> None:
         self._token = token
         self._username = username
+        self._owned_repos_cache: list[dict[str, Any]] | None = None
 
     def count_owned_repos(self) -> GitHubRepoCount:
+        owned = self.list_owned_repos()
+        return GitHubRepoCount(count=len(owned), repos=owned)
+
+    def list_owned_repos(self) -> list[dict[str, Any]]:
+        if self._owned_repos_cache is not None:
+            return self._owned_repos_cache
+
         repos: list[dict[str, Any]] = []
         page = 1
         while True:
@@ -27,8 +35,8 @@ class GitHubClient:
             repos.extend(batch)
             page += 1
 
-        owned = [repo for repo in repos if self._is_owned(repo)]
-        return GitHubRepoCount(count=len(owned), repos=owned)
+        self._owned_repos_cache = [repo for repo in repos if self._is_owned(repo)]
+        return self._owned_repos_cache
 
     def _fetch_page(self, page: int) -> list[dict[str, Any]]:
         url = "https://api.github.com/user/repos"
