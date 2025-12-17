@@ -4,13 +4,31 @@ from datetime import datetime
 
 
 def render_stats_html(
-    repo_count: int,
-    md_count: int,
+    repo_count: int | None,
+    md_count: int | None,
     screen_width: int,
     screen_height: int,
     generated_at: datetime | None = None,
+    error_count: int = 0,
 ) -> str:
     timestamp = (generated_at or datetime.now()).strftime("%Y-%m-%d %H:%M")
+    repo_value = str(repo_count) if repo_count is not None else "N/A"
+    md_value = str(md_count) if md_count is not None else "N/A"
+    repo_note = (
+        "Owned and tracked"
+        if repo_count is not None
+        else "Unavailable (see log)"
+    )
+    md_note = "Markdown notes" if md_count is not None else "Unavailable (see log)"
+    warning_html = ""
+    if error_count:
+        warning_html = f"""
+        <div class=\"mt-10 rounded-2xl border border-amber-200/70 bg-amber-50/70 px-6 py-4 text-sm text-amber-900\">
+          <p class=\"text-xs font-semibold uppercase tracking-[0.3em] text-amber-700\">Attention</p>
+          <p class=\"mt-2 text-base font-semibold\">Partial data available ({error_count} issue(s))</p>
+          <p class=\"mt-1 text-amber-800/80\">Review runtime/automation.log.jsonl for details.</p>
+        </div>
+        """
 
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
@@ -138,19 +156,21 @@ def render_stats_html(
           <div class=\"glass-panel stat-card\" style=\"animation-delay: 120ms;\">
             <p class=\"stat-label text-slate-500\">GitHub Repos</p>
             <div class=\"mt-6 flex items-end justify-between\">
-              <span class=\"stat-value text-slate-900\">{repo_count}</span>
-              <span class=\"text-sm text-slate-500\">Owned and tracked</span>
+              <span class=\"stat-value text-slate-900\">{repo_value}</span>
+              <span class=\"text-sm text-slate-500\">{repo_note}</span>
             </div>
           </div>
 
           <div class=\"glass-panel stat-card\" style=\"animation-delay: 240ms;\">
             <p class=\"stat-label text-slate-500\">Obsidian Vault</p>
             <div class=\"mt-6 flex items-end justify-between\">
-              <span class=\"stat-value text-slate-900\">{md_count}</span>
-              <span class=\"text-sm text-slate-500\">Markdown notes</span>
+              <span class=\"stat-value text-slate-900\">{md_value}</span>
+              <span class=\"text-sm text-slate-500\">{md_note}</span>
             </div>
           </div>
         </section>
+
+        {warning_html}
 
         <footer class=\"mt-auto flex items-end justify-between text-sm text-slate-500\">
           <div>
