@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from .base import Automation
-from ..context import AutomationContext
-from ..models import AutomationResult, AutomationSpec, ReportElement
-from ..services.obsidian import count_markdown_files
+from ..base import Automation
+from ...context import AutomationContext
+from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...services.obsidian import count_markdown_files
 
 
 class ObsidianMarkdownCountAutomation(Automation):

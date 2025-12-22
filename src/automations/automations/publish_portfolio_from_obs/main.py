@@ -5,9 +5,9 @@ from pathlib import Path
 import subprocess
 from typing import Any
 
-from .base import Automation
-from ..context import AutomationContext
-from ..models import AutomationResult, AutomationSpec, ReportElement
+from ..base import Automation
+from ...context import AutomationContext
+from ...models import AutomationResult, AutomationSpec, ReportElement
 
 PORTFOLIO_PATH = Path("/home/brokkoli/GITHUB/zk-best-learning-tool")
 OBSIDIAN_COMMAND = [".venv/bin/obsidian-to-web", "--config", "config.yaml"]

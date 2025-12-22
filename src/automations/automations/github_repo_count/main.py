@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from .base import Automation
-from ..context import AutomationContext
-from ..models import AutomationResult, AutomationSpec, ReportElement
+from ..base import Automation
+from ...context import AutomationContext
+from ...models import AutomationResult, AutomationSpec, ReportElement
 
 
 class GitHubRepoCountAutomation(Automation):

@@ -5,8 +5,8 @@ This project is designed for many small, independent automations. Each automatio
 ## Steps
 
 1. **Create a module**
-   - Add a new file in `src/automations/automations/`, e.g. `my_automation.py`.
-   - Implement the `Automation` interface with a `spec` and `run()` method.
+   - Add a new folder in `src/automations/automations/`, e.g. `my_automation/`.
+   - Add `main.py` inside that folder and implement the `Automation` interface with a `spec` and `run()` method.
 
 2. **Register it**
    - Add the new class to `src/automations/automations/__init__.py`.
@@ -32,9 +32,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from .base import Automation
-from ..context import AutomationContext
-from ..models import AutomationResult, AutomationSpec, ReportElement
+from ..base import Automation
+from ...context import AutomationContext
+from ...models import AutomationResult, AutomationSpec, ReportElement
 
 
 class MyAutomation(Automation):
