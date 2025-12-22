@@ -4,12 +4,17 @@ enabled_automations:
   - obsidian_md_count
   - unedited_kindle_notes
   - wallpaper_from_report
+  - obsidian_essay_to_website
   - publish_portfolio_from_obs
 
 github_username: "your-username"
 github_token: "ghp_yourtoken"
 
 vault_path: "/home/you/obsidian-vault"
+vault_media_path: "/home/you/obsidian-vault/media"
+essay_include_string: "tags: essay"
+essay_output_folder: "output/essays"
+essay_media_folder: "output/essays/media"
 
 report:
   screen_width: 2560

@@ -3,6 +3,7 @@ from __future__ import annotations
 from .automations import (
     GitHubRepoCountAutomation,
     ObsidianMarkdownCountAutomation,
+    ObsidianEssayToWebsiteAutomation,
     PublishPortfolioFromObsAutomation,
     UneditedKindleNotesAutomation,
     WallpaperFromReportAutomation,
@@ -14,6 +15,7 @@ def load_automations() -> list[Automation]:
     return [
         GitHubRepoCountAutomation(),
         ObsidianMarkdownCountAutomation(),
+        ObsidianEssayToWebsiteAutomation(),
         PublishPortfolioFromObsAutomation(),
         UneditedKindleNotesAutomation(),
         WallpaperFromReportAutomation(),
