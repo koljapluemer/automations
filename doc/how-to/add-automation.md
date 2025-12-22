@@ -13,8 +13,9 @@ This project is designed for many small, independent automations. Each automatio
    - Add an instance to `load_automations()` in `src/automations/registry.py`.
 
 3. **Add config**
-   - Add a config entry in `config.yaml.demo` under `automations:` (and optionally `services:`).
-   - Your automation should read its config via `ctx.settings_for(...)`.
+   - Add any shared config keys in `config.yaml.demo` (top-level), if needed.
+   - Add your automation id to `enabled_automations` in `config.yaml.demo`.
+   - Your automation should read shared config via `ctx.config.settings`.
 
 4. **Add report elements (optional)**
    - Implement `build_report()` to return one or more `ReportElement`s.
@@ -47,7 +48,7 @@ class MyAutomation(Automation):
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
         settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
-        # config values are under settings.config
+        # shared config values are under ctx.config.settings
         # do work here
         return {"result": "ok"}
 
@@ -68,17 +69,14 @@ class MyAutomation(Automation):
 ## Configuration pattern
 
 ```yaml
-services:
-  my_service:
-    api_key: "..."
+enabled_automations:
+  - my_automation
 
-automations:
-  my_automation:
-    enabled: true
-    foo: "bar"
+my_service_api_key: "..."
+my_automation_mode: "fast"
 ```
 
-Use `ctx.services.service_config("my_service")` for shared config. Use `ServiceRegistry` if you create new shared clients.
+Use `ctx.config.settings` for shared config. Use `ServiceRegistry` if you create new shared clients.
 
 ## Logging & caching
 

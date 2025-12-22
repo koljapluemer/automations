@@ -23,10 +23,13 @@ class GitHubRepoCountAutomation(Automation):
 
         settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
         service_cfg = ctx.services.service_config("github")
-        username = settings.config.get("username") or service_cfg.get("username")
-        token = settings.config.get("token") or service_cfg.get("token")
+        shared = ctx.config.settings
+        username = shared.get("github_username") or settings.config.get("username") or service_cfg.get("username")
+        token = shared.get("github_token") or settings.config.get("token") or service_cfg.get("token")
         if not username or not token:
-            raise ValueError("github_repo_count requires 'username' and 'token' in config or services")
+            raise ValueError(
+                "github_repo_count requires 'github_username' and 'github_token' in config (or legacy services)"
+            )
 
         client = ctx.services.github_client(username=str(username), token=str(token))
         result = client.count_owned_repos()

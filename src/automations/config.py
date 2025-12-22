@@ -37,8 +37,16 @@ class AppConfig:
     logging: LoggingConfig
     automations: dict[str, AutomationSettings]
     services: dict[str, Any]
+    settings: dict[str, Any]
+    enabled_automations: set[str] | None = None
 
     def automation_settings(self, automation_id: str, default_enabled: bool = True) -> AutomationSettings:
+        if self.enabled_automations is not None:
+            legacy = self.automations.get(automation_id)
+            return AutomationSettings(
+                enabled=automation_id in self.enabled_automations,
+                config=legacy.config if legacy else {},
+            )
         settings = self.automations.get(automation_id)
         if settings:
             return settings
@@ -81,6 +89,13 @@ def load_config(root: Path | None = None, filename: str = "config.yaml") -> AppC
     log_root_raw = logging_raw.get("root", base / "runtime" / "logs")
     log_root = _resolve_path(base, log_root_raw)
 
+    enabled_automations_raw = raw.get("enabled_automations")
+    enabled_automations: set[str] | None = None
+    if enabled_automations_raw is not None:
+        if not isinstance(enabled_automations_raw, list):
+            raise ValueError("enabled_automations must be a list")
+        enabled_automations = {str(item) for item in enabled_automations_raw}
+
     automations_raw = raw.get("automations", {})
     if automations_raw is None:
         automations_raw = {}
@@ -103,6 +118,9 @@ def load_config(root: Path | None = None, filename: str = "config.yaml") -> AppC
     if not isinstance(services_raw, dict):
         raise ValueError("services must be a mapping")
 
+    reserved = {"report", "logging", "automations", "services", "enabled_automations"}
+    settings = {key: value for key, value in raw.items() if key not in reserved}
+
     report = ReportConfig(
         screen_width=screen_width,
         screen_height=screen_height,
@@ -116,6 +134,8 @@ def load_config(root: Path | None = None, filename: str = "config.yaml") -> AppC
         logging=logging_config,
         automations=automations,
         services=services_raw,
+        settings=settings,
+        enabled_automations=enabled_automations,
     )
 
 

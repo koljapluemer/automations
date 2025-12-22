@@ -22,11 +22,12 @@ class WallpaperFromReportAutomation(Automation):
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
         settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
         html_path = _resolve_html_path(ctx)
+        shared = ctx.config.settings
 
-        output_path = _resolve_output_path(settings.config, ctx)
+        output_path = _resolve_output_path(shared, settings.config, ctx)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        renderer = settings.config.get("renderer")
+        renderer = shared.get("wallpaper_renderer") or settings.config.get("renderer")
         renderer = str(renderer) if renderer else "auto"
 
         _render_html_to_image(
@@ -37,9 +38,15 @@ class WallpaperFromReportAutomation(Automation):
             renderer=renderer,
         )
 
-        set_wallpaper = settings.config.get("set_wallpaper", True)
+        set_wallpaper = shared.get("wallpaper_set_wallpaper")
+        if set_wallpaper is None:
+            set_wallpaper = settings.config.get("set_wallpaper", True)
         if set_wallpaper:
-            picture_options = settings.config.get("picture_options", "zoom")
+            picture_options = (
+                shared.get("wallpaper_picture_options")
+                or settings.config.get("picture_options")
+                or "zoom"
+            )
             _set_wallpaper(output_path, picture_options=str(picture_options))
 
         return {
@@ -60,8 +67,13 @@ def _resolve_html_path(ctx: AutomationContext) -> Path:
     return html_path
 
 
-def _resolve_output_path(config: dict[str, Any], ctx: AutomationContext) -> Path:
-    raw = config.get("output_image") or config.get("output_path") or "output/wallpaper.png"
+def _resolve_output_path(shared: dict[str, Any], legacy: dict[str, Any], ctx: AutomationContext) -> Path:
+    raw = (
+        shared.get("wallpaper_output_image")
+        or legacy.get("output_image")
+        or legacy.get("output_path")
+        or "output/wallpaper.png"
+    )
     path = Path(str(raw)).expanduser()
     if not path.is_absolute():
         path = ctx.config.project_root / path

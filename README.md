@@ -39,4 +39,4 @@ Run just the portfolio publisher automation:
 uv run automations --only publish_portfolio_from_obs
 ```
 
-Ensure `publish_portfolio_from_obs` is enabled in `config.yaml` when running it manually.
+Ensure `publish_portfolio_from_obs` is listed under `enabled_automations` in `config.yaml` when running it manually.
