@@ -46,22 +46,23 @@ def render_report(model: ReportModel) -> str:
       }}
 
       .stat-card {{
-        border-radius: 16px;
-        padding: 28px;
+        border-radius: 12px;
+        padding: 16px;
         position: relative;
         overflow: hidden;
       }}
 
       .stat-label {{
-        font-size: 12px;
-        letter-spacing: 0.2em;
+        font-size: 10px;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
       }}
 
       .stat-value {{
         font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-        font-size: 64px;
+        font-size: 32px;
         line-height: 1;
+        font-weight: 600;
       }}
 
       .panel-error {{
@@ -84,7 +85,7 @@ def render_report(model: ReportModel) -> str:
           <span class=\"ml-4 text-sm font-semibold text-slate-100\">{timestamp}</span>
         </div>
 
-        <section class=\"mt-8 grid grid-cols-2 gap-10 auto-rows-[1fr]\">
+        <section class=\"mt-8 grid grid-cols-4 gap-6 auto-rows-[1fr]\">
           {elements_html}
         </section>
 
@@ -121,14 +122,12 @@ def _render_element(element: ReportElement) -> str:
 
     title = element.title or "Untitled"
     value = element.value or "N/A"
-    note = element.note or ""
 
     return f"""
     <div class=\"glass-panel stat-card{status_class}\" style=\"{style}\">
       <p class=\"stat-label text-slate-300\">{title}</p>
-      <div class=\"mt-6 flex items-end justify-between\">
+      <div class=\"mt-3 flex items-end\">
         <span class=\"stat-value text-slate-50\">{value}</span>
-        <span class=\"text-sm text-slate-300\">{note}</span>
       </div>
     </div>
     """

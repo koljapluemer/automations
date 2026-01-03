@@ -33,30 +33,48 @@ class GitHubRepoCountAutomation(Automation):
 
         client = ctx.services.github_client(username=str(username), token=str(token))
         result = client.count_owned_repos()
-        return {"count": result.count, "username": str(username), "cached": False}
+        active_count = client.count_active_repos()
+        return {
+            "count": result.count,
+            "active_count": active_count,
+            "username": str(username),
+            "cached": False
+        }
 
     def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        value = None
-        note = "Owned and tracked"
         status = result.status
-        if result.status == "ok":
-            count = result.payload.get("count")
-            value = str(count) if count is not None else "N/A"
-            if result.payload.get("cached"):
-                note = "Cached today"
-        else:
-            value = "N/A"
-            if result.message:
-                note = "Unavailable (see log)"
+        if result.status != "ok":
+            return [
+                ReportElement(
+                    id=f"{self.spec.id}_total",
+                    kind="stat",
+                    title="GitHub Repos",
+                    value="N/A",
+                    note="",
+                    status=status,
+                )
+            ]
+
+        total_count = result.payload.get("count")
+        active_count = result.payload.get("active_count", total_count)
+
         return [
             ReportElement(
-                id=self.spec.id,
+                id=f"{self.spec.id}_total",
                 kind="stat",
-                title="GitHub Repos",
-                value=value,
-                note=note,
+                title="Total Repos",
+                value=str(total_count) if total_count is not None else "N/A",
+                note="",
                 status=status,
-            )
+            ),
+            ReportElement(
+                id=f"{self.spec.id}_active",
+                kind="stat",
+                title="Active Repos",
+                value=str(active_count) if active_count is not None else "N/A",
+                note="",
+                status=status,
+            ),
         ]
 
 

@@ -22,6 +22,11 @@ class GitHubClient:
         owned = self.list_owned_repos()
         return GitHubRepoCount(count=len(owned), repos=owned)
 
+    def count_active_repos(self) -> int:
+        """Count non-archived repos owned by the user."""
+        owned = self.list_owned_repos()
+        return sum(1 for repo in owned if not repo.get("archived", False))
+
     def list_owned_repos(self) -> list[dict[str, Any]]:
         if self._owned_repos_cache is not None:
             return self._owned_repos_cache
