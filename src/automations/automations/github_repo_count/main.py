@@ -89,7 +89,15 @@ def _load_cached_count(ctx: AutomationContext, automation_id: str) -> dict[str, 
         return None
     count = payload.get("count")
     if isinstance(count, int):
-        return {"count": count, "username": payload.get("username")}
+        result = {"count": count, "username": payload.get("username")}
+        active_count = payload.get("active_count")
+        if active_count is not None:
+            result["active_count"] = active_count
+        return result
     if isinstance(count, str) and count.isdigit():
-        return {"count": int(count), "username": payload.get("username")}
+        result = {"count": int(count), "username": payload.get("username")}
+        active_count = payload.get("active_count")
+        if active_count is not None:
+            result["active_count"] = active_count
+        return result
     return None
