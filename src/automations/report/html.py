@@ -85,7 +85,7 @@ def render_report(model: ReportModel) -> str:
           <span class=\"ml-4 text-sm font-semibold text-slate-100\">{timestamp}</span>
         </div>
 
-        <section class=\"mt-8 grid grid-cols-4 gap-6 auto-rows-[1fr]\">
+        <section class=\"mt-8 grid grid-cols-4 gap-6 auto-rows-auto\">
           {elements_html}
         </section>
 

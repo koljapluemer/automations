@@ -5,6 +5,7 @@ from .automations import (
     ObsidianMarkdownCountAutomation,
     ObsidianEssayToWebsiteAutomation,
     PublishPortfolioFromObsAutomation,
+    RandomArtAutomation,
     UneditedKindleNotesAutomation,
     WallpaperFromReportAutomation,
 )
@@ -17,6 +18,7 @@ def load_automations() -> list[Automation]:
         ObsidianMarkdownCountAutomation(),
         ObsidianEssayToWebsiteAutomation(),
         PublishPortfolioFromObsAutomation(),
+        RandomArtAutomation(),
         UneditedKindleNotesAutomation(),
         WallpaperFromReportAutomation(),
     ]
