@@ -7,7 +7,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 
 
 class WallpaperFromReportAutomation(Automation):
@@ -55,9 +55,6 @@ class WallpaperFromReportAutomation(Automation):
             "renderer": renderer,
             "set_wallpaper": bool(set_wallpaper),
         }
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        return []
 
 
 def _resolve_html_path(ctx: AutomationContext) -> Path:

@@ -7,7 +7,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 
 PORTFOLIO_PATH = Path("/home/brokkoli/GITHUB/zk-best-learning-tool")
 OBSIDIAN_COMMAND = [".venv/bin/obsidian-to-web", "--config", "config.yaml"]
@@ -39,29 +39,6 @@ class PublishPortfolioFromObsAutomation(Automation):
         _run_command(["git", "push"], cwd=PORTFOLIO_PATH)
 
         return {"status": "updated", "timestamp": timestamp}
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        if result.status == "skipped":
-            return []
-        message = "Portfolio update failed"
-        status = None
-        if result.status == "ok":
-            status_flag = result.payload.get("status")
-            if status_flag == "no_changes":
-                message = "Nothing new in portfolio"
-            else:
-                message = "Portfolio updated"
-        else:
-            status = "error"
-        return [
-            ReportElement(
-                id=self.spec.id,
-                kind="stat",
-                title="Portfolio Publish",
-                value=message,
-                status=status,
-            )
-        ]
 
 
 def _ensure_portfolio_path() -> None:

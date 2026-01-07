@@ -5,6 +5,7 @@ src/automations/__main__.py
 src/automations/cli.py
 src/automations/config.py
 src/automations/context.py
+src/automations/dto.py
 src/automations/models.py
 src/automations/registry.py
 src/automations/runner.py
@@ -16,6 +17,8 @@ src/automations.egg-info/requires.txt
 src/automations.egg-info/top_level.txt
 src/automations/automations/__init__.py
 src/automations/automations/base.py
+src/automations/automations/git_commit_tracker/__init__.py
+src/automations/automations/git_commit_tracker/main.py
 src/automations/automations/github_repo_count/__init__.py
 src/automations/automations/github_repo_count/main.py
 src/automations/automations/obsidian_essay_to_website/__init__.py
@@ -24,6 +27,8 @@ src/automations/automations/obsidian_md_count/__init__.py
 src/automations/automations/obsidian_md_count/main.py
 src/automations/automations/publish_portfolio_from_obs/__init__.py
 src/automations/automations/publish_portfolio_from_obs/main.py
+src/automations/automations/random_art/__init__.py
+src/automations/automations/random_art/main.py
 src/automations/automations/unedited_kindle_notes/__init__.py
 src/automations/automations/unedited_kindle_notes/main.py
 src/automations/automations/wallpaper_from_report/__init__.py

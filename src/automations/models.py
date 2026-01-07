@@ -34,28 +34,6 @@ class AutomationResult:
 
 
 @dataclass(frozen=True)
-class ReportElement:
-    id: str
-    kind: str
-    title: str | None = None
-    value: str | None = None
-    note: str | None = None
-    status: str | None = None
-    col_span: int = 1
-    row_span: int = 1
-    data: dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass(frozen=True)
-class ReportModel:
-    elements: list[ReportElement]
-    generated_at: datetime
-    screen_width: int
-    screen_height: int
-    warnings: list[str] = field(default_factory=list)
-
-
-@dataclass(frozen=True)
 class RunSummary:
     results: tuple[AutomationResult, ...]
     report_path: str | None

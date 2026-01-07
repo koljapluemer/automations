@@ -5,7 +5,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 from ...services.obsidian import count_location_occurrences
 
 
@@ -22,28 +22,6 @@ class UneditedKindleNotesAutomation(Automation):
         vault_path = _resolve_vault_path(ctx.config.settings, settings.config, ctx)
         count = count_location_occurrences(vault_path)
         return {"count": count, "vault_path": str(vault_path)}
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        value = None
-        note = "Unedited highlights"
-        status = result.status
-        if result.status == "ok":
-            count = result.payload.get("count")
-            value = str(count) if count is not None else "N/A"
-        else:
-            value = "N/A"
-            if result.message:
-                note = "Unavailable (see log)"
-        return [
-            ReportElement(
-                id=self.spec.id,
-                kind="stat",
-                title="Kindle Notes",
-                value=value,
-                note=note,
-                status=status,
-            )
-        ]
 
 
 def _resolve_vault_path(shared: dict[str, Any], legacy: dict[str, Any], ctx: AutomationContext) -> Path:

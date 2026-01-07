@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from ..context import AutomationContext
-from ..models import AutomationResult, AutomationSpec, ReportElement
+from ..models import AutomationResult, AutomationSpec
 
 
 class Automation(ABC):
@@ -13,6 +13,3 @@ class Automation(ABC):
     @abstractmethod
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
         raise NotImplementedError
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        return []

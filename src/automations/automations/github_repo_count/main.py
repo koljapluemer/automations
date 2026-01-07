@@ -4,7 +4,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 
 
 class GitHubRepoCountAutomation(Automation):
@@ -40,42 +40,6 @@ class GitHubRepoCountAutomation(Automation):
             "username": str(username),
             "cached": False
         }
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        status = result.status
-        if result.status != "ok":
-            return [
-                ReportElement(
-                    id=f"{self.spec.id}_total",
-                    kind="stat",
-                    title="GitHub Repos",
-                    value="N/A",
-                    note="",
-                    status=status,
-                )
-            ]
-
-        total_count = result.payload.get("count")
-        active_count = result.payload.get("active_count", total_count)
-
-        return [
-            ReportElement(
-                id=f"{self.spec.id}_total",
-                kind="stat",
-                title="Total Repos",
-                value=str(total_count) if total_count is not None else "N/A",
-                note="",
-                status=status,
-            ),
-            ReportElement(
-                id=f"{self.spec.id}_active",
-                kind="stat",
-                title="Active Repos",
-                value=str(active_count) if active_count is not None else "N/A",
-                note="",
-                status=status,
-            ),
-        ]
 
 
 def _load_cached_count(ctx: AutomationContext, automation_id: str) -> dict[str, Any] | None:

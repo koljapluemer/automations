@@ -6,7 +6,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg"}
@@ -47,51 +47,6 @@ class RandomArtAutomation(Automation):
             "image_name": selected_image.name,
             "total_images": len(image_files),
         }
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        status = result.status
-
-        if result.status != "ok":
-            return [
-                ReportElement(
-                    id=f"{self.spec.id}_display",
-                    kind="stat",
-                    title="Random Art",
-                    value="N/A",
-                    note=result.message or "Error loading art",
-                    status=status,
-                )
-            ]
-
-        image_path = result.payload.get("image_path")
-        image_name = result.payload.get("image_name", "Art")
-        total_images = result.payload.get("total_images", 0)
-
-        if not image_path:
-            return [
-                ReportElement(
-                    id=f"{self.spec.id}_display",
-                    kind="stat",
-                    title="Random Art",
-                    value="N/A",
-                    note="No image path available",
-                    status="error",
-                )
-            ]
-
-        return [
-            ReportElement(
-                id=f"{self.spec.id}_display",
-                kind="image",
-                title=f"Random Art ({total_images} total)",
-                col_span=2,
-                row_span=2,
-                data={
-                    "src": f"file://{image_path}",
-                    "alt": image_name,
-                },
-            )
-        ]
 
     def _find_image_files(self, folder: Path) -> list[Path]:
         """Find all image files in the given folder (non-recursive)."""

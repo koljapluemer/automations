@@ -12,7 +12,7 @@ import markdown
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 
 IMAGE_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 
@@ -76,9 +76,6 @@ class ObsidianEssayToWebsiteAutomation(Automation):
             "outputs": outputs,
             "enabled": settings.enabled,
         }
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        return []
 
 
 def _load_config(settings: dict[str, Any], ctx: AutomationContext) -> EssayConfig:

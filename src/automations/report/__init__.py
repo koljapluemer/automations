@@ -1,3 +1,3 @@
-from .html import render_report
+from .html import render_dashboard
 
-__all__ = ["render_report"]
+__all__ = ["render_dashboard"]

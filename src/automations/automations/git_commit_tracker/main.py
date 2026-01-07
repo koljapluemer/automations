@@ -7,7 +7,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationResult, AutomationSpec
 
 
 class GitCommitTrackerAutomation(Automation):
@@ -59,50 +59,6 @@ class GitCommitTrackerAutomation(Automation):
             "daily_commits": daily_commits,
             "svg_path": str(svg_path),
         }
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        status = result.status
-
-        if result.status != "ok":
-            return [
-                ReportElement(
-                    id=f"{self.spec.id}_display",
-                    kind="stat",
-                    title="Git Commits",
-                    value="N/A",
-                    note=result.message or "Error loading commit data",
-                    status=status,
-                )
-            ]
-
-        svg_path = result.payload.get("svg_path")
-        repo_count = result.payload.get("repo_count", 0)
-
-        if not svg_path or repo_count == 0:
-            return [
-                ReportElement(
-                    id=f"{self.spec.id}_display",
-                    kind="stat",
-                    title="Git Commits",
-                    value="No repos",
-                    note="",
-                    status="ok",
-                )
-            ]
-
-        return [
-            ReportElement(
-                id=f"{self.spec.id}_display",
-                kind="image",
-                title="",
-                col_span=1,
-                row_span=1,
-                data={
-                    "src": f"file://{svg_path}",
-                    "alt": "Git commits (14 days)",
-                },
-            )
-        ]
 
 
 def _scan_git_repos(base_path: Path) -> list[Path]:

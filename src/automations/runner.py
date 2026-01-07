@@ -5,10 +5,11 @@ from pathlib import Path
 
 from .config import AppConfig
 from .context import AutomationContext
+from .dto import DashboardDTO
 from .logging.log_writer import LogWriter
-from .models import AutomationResult, ReportModel, RunSummary
+from .models import AutomationResult, RunSummary
 from .registry import load_automations
-from .report.html import render_report
+from .report.html import render_dashboard
 from .services.registry import ServiceRegistry
 
 
@@ -36,17 +37,15 @@ def run_automations(
     _safe_log_run(log, "run_start", {"run_id": run_id, "automation_count": len(automations)})
 
     results: list[AutomationResult] = []
-    report_elements = []
     warnings: list[str] = []
 
     for automation in primary:
         result = _run_single(automation, ctx, only=only, skip=skip)
         results.append(result)
-        report_elements.extend(automation.build_report(result))
         if result.status == "error" and result.message:
             warnings.append(f"{result.automation_id}: {result.message}")
 
-    report_path = _write_report(config, report_elements, warnings)
+    report_path = _write_dashboard(config, results, datetime.now())
     if not report_path:
         warnings.append("Report generation failed; see run log for details")
     else:
@@ -149,21 +148,48 @@ def _log_result(log: LogWriter, result: AutomationResult) -> None:
     _safe_log_run(log, "automation_result", {"automation_id": result.automation_id, **payload})
 
 
-def _write_report(config: AppConfig, elements: list, warnings: list[str]) -> Path | None:
-    report = ReportModel(
-        elements=elements,
-        generated_at=datetime.now(),
-        screen_width=config.report.screen_width,
-        screen_height=config.report.screen_height,
-        warnings=warnings,
-    )
-    html = render_report(report)
+def _write_dashboard(config: AppConfig, results: list[AutomationResult], generated_at: datetime) -> Path | None:
+    """Build DTO from results and render dashboard HTML."""
+    dto = _build_dto(results, generated_at)
+    html = render_dashboard(dto)
     try:
         config.report.output_html.parent.mkdir(parents=True, exist_ok=True)
         config.report.output_html.write_text(html, encoding="utf-8")
     except Exception:
         return None
     return config.report.output_html
+
+
+def _build_dto(results: list[AutomationResult], generated_at: datetime) -> DashboardDTO:
+    """Build dashboard DTO from automation results."""
+    # Create map of automation_id → payload (only successful results)
+    data_map = {r.automation_id: r.payload for r in results if r.status == "ok"}
+
+    # Extract data from specific automations with fallbacks
+    git_data = data_map.get("git_commit_tracker", {})
+    github_data = data_map.get("github_repo_count", {})
+    obsidian_data = data_map.get("obsidian_md_count", {})
+    art_data = data_map.get("random_art", {})
+
+    # Convert daily_commits dict to list of 14 counts
+    daily_commits = git_data.get("daily_commits", {})
+    from datetime import date, timedelta
+    today = date.today()
+    commit_heatmap = [
+        daily_commits.get((today - timedelta(days=i)).strftime("%Y-%m-%d"), 0)
+        for i in range(13, -1, -1)
+    ]
+
+    return DashboardDTO(
+        generated_at=generated_at,
+        artwork_image_path=art_data.get("image_path", ""),
+        artwork_filename=art_data.get("image_name", "N/A"),
+        active_repos=github_data.get("active_count", 0),
+        vault_notes=obsidian_data.get("count", 0),
+        zk_percentage=obsidian_data.get("zk_percentage", 0.0),
+        leaf_percentage=obsidian_data.get("leaf_percentage", 0.0),
+        commit_heatmap=commit_heatmap,
+    )
 
 
 def _safe_log(callable_, *args) -> None:
