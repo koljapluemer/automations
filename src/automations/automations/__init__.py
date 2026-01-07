@@ -1,4 +1,5 @@
 from .base import Automation
+from .git_commit_tracker import GitCommitTrackerAutomation
 from .github_repo_count import GitHubRepoCountAutomation
 from .obsidian_md_count import ObsidianMarkdownCountAutomation
 from .obsidian_essay_to_website import ObsidianEssayToWebsiteAutomation
@@ -9,6 +10,7 @@ from .wallpaper_from_report import WallpaperFromReportAutomation
 
 __all__ = [
     "Automation",
+    "GitCommitTrackerAutomation",
     "GitHubRepoCountAutomation",
     "ObsidianMarkdownCountAutomation",
     "ObsidianEssayToWebsiteAutomation",

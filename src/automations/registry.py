@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .automations import (
+    GitCommitTrackerAutomation,
     GitHubRepoCountAutomation,
     ObsidianMarkdownCountAutomation,
     ObsidianEssayToWebsiteAutomation,
@@ -14,6 +15,7 @@ from .automations.base import Automation
 
 def load_automations() -> list[Automation]:
     return [
+        GitCommitTrackerAutomation(),
         GitHubRepoCountAutomation(),
         ObsidianMarkdownCountAutomation(),
         ObsidianEssayToWebsiteAutomation(),

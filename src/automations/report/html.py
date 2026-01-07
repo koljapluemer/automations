@@ -111,9 +111,12 @@ def _render_element(element: ReportElement) -> str:
         src = element.data.get("src")
         alt = element.data.get("alt") or element.title or ""
         if src:
+            title_html = ""
+            if element.title:
+                title_html = f'<p class="stat-label text-slate-300">{element.title}</p>'
             return f"""
             <div class=\"glass-panel stat-card{status_class}\" style=\"{style}\">
-              <p class=\"stat-label text-slate-300\">{element.title or "Image"}</p>
+              {title_html}
               <div class=\"mt-6 flex h-full items-center justify-center\">
                 <img src=\"{src}\" alt=\"{alt}\" class=\"max-h-full max-w-full rounded-2xl\" />
               </div>
