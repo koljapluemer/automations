@@ -38,9 +38,9 @@ class DashboardDTO:
     def _get_color(self, commit_count: int, max_commits: int) -> str:
         """Map commit count to GitHub-style green gradient."""
         if commit_count == 0:
-            return "#ebedf0"  # Light gray
+            return "transparent"
         if max_commits == 0:
-            return "#ebedf0"
+            return "transparent"
 
         ratio = commit_count / max_commits
 

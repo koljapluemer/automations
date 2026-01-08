@@ -1,6 +1,6 @@
 # Adding an automation
 
-This project is designed for many small, independent automations. Each automation lives in its own module, declares metadata, runs with a shared context, and can optionally emit report elements.
+This project is designed for many small, independent automations. Each automation lives in its own module, declares metadata, runs with a shared context, and returns data.
 
 ## Steps
 
@@ -17,9 +17,10 @@ This project is designed for many small, independent automations. Each automatio
    - Add your automation id to `enabled_automations` in `config.yaml.demo`.
    - Your automation should read shared config via `ctx.config.settings`.
 
-4. **Add report elements (optional)**
-   - Implement `build_report()` to return one or more `ReportElement`s.
-   - Use `col_span`/`row_span` if you need larger tiles, or `kind="image"` for image tiles.
+4. **Add to dashboard (optional)**
+   - If you want data on the dashboard, update `_build_dto()` in `src/automations/runner.py` to extract your data.
+   - Update `DashboardDTO` in `src/automations/dto.py` with new fields.
+   - Update the Jinja2 template in `src/automations/report/template.html` to display your data.
 
 5. **Run & verify**
    - `uv run automations --list` should show your automation.
@@ -34,7 +35,7 @@ from typing import Any
 
 from ..base import Automation
 from ...context import AutomationContext
-from ...models import AutomationResult, AutomationSpec, ReportElement
+from ...models import AutomationSpec
 
 
 class MyAutomation(Automation):
@@ -50,20 +51,7 @@ class MyAutomation(Automation):
         settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
         # shared config values are under ctx.config.settings
         # do work here
-        return {"result": "ok"}
-
-    def build_report(self, result: AutomationResult) -> list[ReportElement]:
-        if result.status != "ok":
-            return []
-        return [
-            ReportElement(
-                id=self.spec.id,
-                kind="stat",
-                title="My Stat",
-                value=str(result.payload.get("result", "N/A")),
-                note="Optional note",
-            )
-        ]
+        return {"my_data": 42, "status": "completed"}
 ```
 
 ## Configuration pattern

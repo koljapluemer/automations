@@ -1,11 +1,16 @@
 # automations
 
-Personal automation runner.
+Personal automation runner with dashboard generation.
 
 ## Quick start
 
 - Copy `config.yaml.demo` to `config.yaml` and fill in values.
 - Run with `uv run automations`.
+- Dashboard is rendered to `output/stats.html` and optionally set as wallpaper.
+
+## Architecture
+
+Automations return data → DTO → Jinja2 template → HTML dashboard. Each automation is independent and only returns data from its `run()` method.
 
 ## Ubuntu dependencies
 
