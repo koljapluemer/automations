@@ -187,6 +187,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="heatmap-row">
+                    <div class="heatmap-label">Obs Edits</div>
+                    <div class="heatmap-value">
+                        <div class="heatmap-squares">
+                            {% for color in obs_edits_colors %}
+                            <div class="heatmap-square" style="background-color: {{ color }};"></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

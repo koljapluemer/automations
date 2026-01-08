@@ -2,6 +2,7 @@ from .base import Automation
 from .git_commit_tracker import GitCommitTrackerAutomation
 from .github_repo_count import GitHubRepoCountAutomation
 from .obsidian_md_count import ObsidianMarkdownCountAutomation
+from .obsidian_edit_tracker import ObsidianEditTrackerAutomation
 from .obsidian_essay_to_website import ObsidianEssayToWebsiteAutomation
 from .publish_portfolio_from_obs import PublishPortfolioFromObsAutomation
 from .random_art import RandomArtAutomation
@@ -13,6 +14,7 @@ __all__ = [
     "GitCommitTrackerAutomation",
     "GitHubRepoCountAutomation",
     "ObsidianMarkdownCountAutomation",
+    "ObsidianEditTrackerAutomation",
     "ObsidianEssayToWebsiteAutomation",
     "PublishPortfolioFromObsAutomation",
     "RandomArtAutomation",

@@ -170,6 +170,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     github_data = data_map.get("github_repo_count", {})
     obsidian_data = data_map.get("obsidian_md_count", {})
     art_data = data_map.get("random_art", {})
+    obs_edits_data = data_map.get("obsidian_edit_tracker", {})
 
     # Convert daily_commits dict to list of 14 counts
     daily_commits = git_data.get("daily_commits", {})
@@ -177,6 +178,13 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     today = date.today()
     commit_heatmap = [
         daily_commits.get((today - timedelta(days=i)).strftime("%Y-%m-%d"), 0)
+        for i in range(13, -1, -1)
+    ]
+
+    # Convert daily_edits dict to list of 14 counts
+    daily_edits = obs_edits_data.get("daily_edits", {})
+    obs_edits_heatmap = [
+        daily_edits.get((today - timedelta(days=i)).strftime("%Y-%m-%d"), 0)
         for i in range(13, -1, -1)
     ]
 
@@ -189,6 +197,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         zk_percentage=obsidian_data.get("zk_percentage", 0.0),
         leaf_percentage=obsidian_data.get("leaf_percentage", 0.0),
         commit_heatmap=commit_heatmap,
+        obs_edits_heatmap=obs_edits_heatmap,
     )
 
 
