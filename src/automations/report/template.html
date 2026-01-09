@@ -137,6 +137,12 @@
             width: 20px;
             height: 20px;
         }
+
+        .weekly-commit-check {
+            font-size: 16px;
+            color: #7bc96f;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -195,6 +201,18 @@
                             <div class="heatmap-square" style="background-color: {{ color }};"></div>
                             {% endfor %}
                         </div>
+                    </div>
+                </div>
+                <div class="heatmap-row">
+                    <div class="heatmap-label">Portfolio Commits</div>
+                    <div class="heatmap-value">
+                        <span class="weekly-commit-check">{{ weekly_portfolio_commit }}</span>
+                    </div>
+                </div>
+                <div class="heatmap-row">
+                    <div class="heatmap-label">Main Repo Commits</div>
+                    <div class="heatmap-value">
+                        <span class="weekly-commit-check">{{ weekly_main_commit }}</span>
                     </div>
                 </div>
             </div>

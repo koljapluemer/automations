@@ -17,6 +17,8 @@ class DashboardDTO:
     leaf_percentage: float
     commit_heatmap: list[int]  # 14 days of commit counts
     obs_edits_heatmap: list[int]  # 14 days of obsidian edit counts
+    weekly_portfolio_commit: bool  # Portfolio repo committed this week
+    weekly_main_commit: bool  # Main repo committed this week
 
     def to_dict(self) -> dict:
         """Convert to dict for Jinja2 template."""
@@ -40,6 +42,8 @@ class DashboardDTO:
             "heatmap_colors": heatmap_colors,
             "obs_edits_heatmap": self.obs_edits_heatmap,
             "obs_edits_colors": obs_edits_colors,
+            "weekly_portfolio_commit": "✓" if self.weekly_portfolio_commit else "",
+            "weekly_main_commit": "✓" if self.weekly_main_commit else "",
         }
 
     def _get_color(self, commit_count: int, max_commits: int) -> str:

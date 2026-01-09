@@ -10,6 +10,7 @@ from .automations import (
     RandomArtAutomation,
     UneditedKindleNotesAutomation,
     WallpaperFromReportAutomation,
+    WeeklyCommitTrackerAutomation,
 )
 from .automations.base import Automation
 
@@ -25,4 +26,5 @@ def load_automations() -> list[Automation]:
         RandomArtAutomation(),
         UneditedKindleNotesAutomation(),
         WallpaperFromReportAutomation(),
+        WeeklyCommitTrackerAutomation(),
     ]
