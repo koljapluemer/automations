@@ -10,7 +10,6 @@ class AutomationSpec:
     id: str
     title: str
     description: str
-    default_enabled: bool = True
     stage: str = "primary"
 
 

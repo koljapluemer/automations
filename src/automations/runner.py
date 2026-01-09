@@ -13,15 +13,12 @@ from .report.html import render_dashboard
 from .services.registry import ServiceRegistry
 
 
-def run_automations(
-    config: AppConfig,
-    only: set[str] | None = None,
-    skip: set[str] | None = None,
-) -> RunSummary:
+def run_automations(config: AppConfig) -> RunSummary:
     run_date = date.today()
     run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-    log = LogWriter(config.logging.root, run_date, run_id)
+    log_root = config.project_root / "runtime" / "logs"
+    log = LogWriter(log_root, run_date, run_id)
     services = ServiceRegistry(config.services)
     ctx = AutomationContext(
         config=config,
@@ -40,7 +37,7 @@ def run_automations(
     warnings: list[str] = []
 
     for automation in primary:
-        result = _run_single(automation, ctx, only=only, skip=skip)
+        result = _run_single(automation, ctx)
         results.append(result)
         if result.status == "error" and result.message:
             warnings.append(f"{result.automation_id}: {result.message}")
@@ -59,7 +56,7 @@ def run_automations(
         )
 
     for automation in post_report:
-        result = _run_single(automation, ctx, only=only, skip=skip)
+        result = _run_single(automation, ctx)
         results.append(result)
         if result.status == "error" and result.message:
             warnings.append(f"{result.automation_id}: {result.message}")
@@ -81,38 +78,10 @@ def run_automations(
     )
 
 
-def _run_single(automation, ctx: AutomationContext, only: set[str] | None, skip: set[str] | None) -> AutomationResult:
+def _run_single(automation, ctx: AutomationContext) -> AutomationResult:
     automation_id = automation.spec.id
-
-    if only and automation_id not in only:
-        result = AutomationResult(
-            automation_id=automation_id,
-            status="skipped",
-            message="Not selected",
-        )
-        _log_result(ctx.log, result)
-        return result
-
-    if skip and automation_id in skip:
-        result = AutomationResult(
-            automation_id=automation_id,
-            status="skipped",
-            message="Skipped by user",
-        )
-        _log_result(ctx.log, result)
-        return result
-
-    settings = ctx.settings_for(automation_id, default_enabled=automation.spec.default_enabled)
-    if not settings.enabled:
-        result = AutomationResult(
-            automation_id=automation_id,
-            status="skipped",
-            message="Disabled in config",
-        )
-        _log_result(ctx.log, result)
-        return result
-
     started_at = datetime.now()
+
     try:
         payload = automation.run(ctx)
         status = "ok"
@@ -121,6 +90,7 @@ def _run_single(automation, ctx: AutomationContext, only: set[str] | None, skip:
         payload = {}
         status = "error"
         message = f"{type(exc).__name__}: {exc}"
+
     finished_at = datetime.now()
 
     result = AutomationResult(
@@ -152,12 +122,13 @@ def _write_dashboard(config: AppConfig, results: list[AutomationResult], generat
     """Build DTO from results and render dashboard HTML."""
     dto = _build_dto(results, generated_at)
     html = render_dashboard(dto)
+    output_html = config.project_root / "output" / "stats.html"
     try:
-        config.report.output_html.parent.mkdir(parents=True, exist_ok=True)
-        config.report.output_html.write_text(html, encoding="utf-8")
+        output_html.parent.mkdir(parents=True, exist_ok=True)
+        output_html.write_text(html, encoding="utf-8")
     except Exception:
         return None
-    return config.report.output_html
+    return output_html
 
 
 def _build_dto(results: list[AutomationResult], generated_at: datetime) -> DashboardDTO:

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from .config import AppConfig, AutomationSettings
+from .config import AppConfig
 from .logging.log_writer import LogWriter
 from .services.registry import ServiceRegistry
 
@@ -17,6 +17,3 @@ class AutomationContext:
     run_date: date
     run_id: str
     report_path: Path | None = None
-
-    def settings_for(self, automation_id: str, default_enabled: bool = True) -> AutomationSettings:
-        return self.config.automation_settings(automation_id, default_enabled=default_enabled)

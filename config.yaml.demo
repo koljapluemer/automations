@@ -1,12 +1,4 @@
 # Copy to config.yaml and fill in your own values.
-enabled_automations:
-  - github_repo_count
-  - obsidian_md_count
-  - unedited_kindle_notes
-  - wallpaper_from_report
-  - obsidian_essay_to_website
-  - publish_portfolio_from_obs
-
 github_username: "your-username"
 github_token: "ghp_yourtoken"
 
@@ -19,12 +11,5 @@ essay_media_folder: "output/essays/media"
 report:
   screen_width: 2560
   screen_height: 1600
-  # output_html: "output/stats.html"
-
-logging:
-  # root: "runtime/logs"
 
 wallpaper_output_image: "output/wallpaper.png"
-wallpaper_renderer: "auto"  # auto, wkhtmltoimage, chromium, google-chrome
-wallpaper_picture_options: "zoom" # zoom, scaled, centered, stretched, spanned
-wallpaper_set_wallpaper: true

@@ -15,62 +15,41 @@ class WallpaperFromReportAutomation(Automation):
         id="wallpaper_from_report",
         title="Wallpaper from Report",
         description="Render the HTML report to an image and set the Ubuntu wallpaper.",
-        default_enabled=True,
         stage="post_report",
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
-        settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
         html_path = _resolve_html_path(ctx)
-        shared = ctx.config.settings
-
-        output_path = _resolve_output_path(shared, settings.config, ctx)
+        output_path = _resolve_output_path(ctx)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        renderer = shared.get("wallpaper_renderer") or settings.config.get("renderer")
-        renderer = str(renderer) if renderer else "auto"
 
         _render_html_to_image(
             html_path=html_path,
             output_path=output_path,
             screen_width=ctx.config.report.screen_width,
             screen_height=ctx.config.report.screen_height,
-            renderer=renderer,
+            renderer="auto",
         )
 
-        set_wallpaper = shared.get("wallpaper_set_wallpaper")
-        if set_wallpaper is None:
-            set_wallpaper = settings.config.get("set_wallpaper", True)
-        if set_wallpaper:
-            picture_options = (
-                shared.get("wallpaper_picture_options")
-                or settings.config.get("picture_options")
-                or "zoom"
-            )
-            _set_wallpaper(output_path, picture_options=str(picture_options))
+        _set_wallpaper(output_path, picture_options="zoom")
 
         return {
             "html_path": str(html_path),
             "image_path": str(output_path),
-            "renderer": renderer,
-            "set_wallpaper": bool(set_wallpaper),
         }
 
 
 def _resolve_html_path(ctx: AutomationContext) -> Path:
-    html_path = ctx.report_path or ctx.config.report.output_html
+    html_path = ctx.report_path
+    if not html_path:
+        raise ValueError("No report path available")
     if not html_path.exists():
         raise FileNotFoundError(f"Report HTML not found: {html_path}")
     return html_path
 
 
-def _resolve_output_path(shared: dict[str, Any], legacy: dict[str, Any], ctx: AutomationContext) -> Path:
-    raw = (
-        shared.get("wallpaper_output_image")
-        or legacy.get("output_image")
-        or legacy.get("output_path")
-        or "output/wallpaper.png"
-    )
+def _resolve_output_path(ctx: AutomationContext) -> Path:
+    raw = ctx.config.settings.get("wallpaper_output_image", "output/wallpaper.png")
     path = Path(str(raw)).expanduser()
     if not path.is_absolute():
         path = ctx.config.project_root / path

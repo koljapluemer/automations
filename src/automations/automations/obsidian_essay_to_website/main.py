@@ -31,12 +31,10 @@ class ObsidianEssayToWebsiteAutomation(Automation):
         id="obsidian_essay_to_website",
         title="Obsidian Essay to Website",
         description="Convert selected Obsidian notes into bespoke HTML pages.",
-        default_enabled=False,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
-        settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
-        config = _load_config(ctx.config.settings, ctx)
+        config = _load_config(ctx)
 
         config.essay_output_folder.mkdir(parents=True, exist_ok=True)
         config.essay_media_folder.mkdir(parents=True, exist_ok=True)
@@ -74,11 +72,11 @@ class ObsidianEssayToWebsiteAutomation(Automation):
             "notes_processed": len(matched_notes),
             "images_copied": images_copied,
             "outputs": outputs,
-            "enabled": settings.enabled,
         }
 
 
-def _load_config(settings: dict[str, Any], ctx: AutomationContext) -> EssayConfig:
+def _load_config(ctx: AutomationContext) -> EssayConfig:
+    settings = ctx.config.settings
     required = [
         "vault_path",
         "vault_media_path",

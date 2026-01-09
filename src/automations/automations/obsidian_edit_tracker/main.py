@@ -15,7 +15,6 @@ class ObsidianEditTrackerAutomation(Automation):
         id="obsidian_edit_tracker",
         title="Obsidian Edit Tracker",
         description="Track markdown file edits in Obsidian vault over last 14 days",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
@@ -45,7 +44,8 @@ class ObsidianEditTrackerAutomation(Automation):
         )
 
         # Build heatmap from last 14 days of logs
-        daily_edits = _load_daily_edits(ctx.config.logging.root, 14)
+        log_root = ctx.config.project_root / "runtime" / "logs"
+        daily_edits = _load_daily_edits(log_root, 14)
 
         return {
             "today_edits": today_edits,

@@ -12,7 +12,6 @@ class GitHubRepoCountAutomation(Automation):
         id="github_repo_count",
         title="GitHub Repo Count",
         description="Count repositories owned by the configured GitHub user.",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
@@ -21,7 +20,6 @@ class GitHubRepoCountAutomation(Automation):
             cached["cached"] = True
             return cached
 
-        settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
         service_cfg = ctx.services.service_config("github")
         shared = ctx.config.settings
         username = shared.get("github_username") or settings.config.get("username") or service_cfg.get("username")

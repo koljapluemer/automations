@@ -18,7 +18,6 @@ class PublishPortfolioFromObsAutomation(Automation):
         id="publish_portfolio_from_obs",
         title="Publish Portfolio from Obsidian",
         description="Build and publish the Obsidian portfolio site.",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:

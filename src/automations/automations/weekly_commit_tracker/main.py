@@ -15,7 +15,6 @@ class WeeklyCommitTrackerAutomation(Automation):
         id="weekly_commit_tracker",
         title="Weekly Commit Tracker",
         description="Track commits to portfolio and main repos this calendar week (Monday-Sunday)",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:

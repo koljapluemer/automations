@@ -17,7 +17,6 @@ class RandomArtAutomation(Automation):
         id="random_art",
         title="Random Art Display",
         description="Display a random image from a configured art folder on the dashboard.",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:

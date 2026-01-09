@@ -15,7 +15,6 @@ class GitCommitTrackerAutomation(Automation):
         id="git_commit_tracker",
         title="Git Commit Tracker",
         description="Track commits across git projects over last 14 days",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:

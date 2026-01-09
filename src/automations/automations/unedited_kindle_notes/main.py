@@ -14,18 +14,16 @@ class UneditedKindleNotesAutomation(Automation):
         id="unedited_kindle_notes",
         title="Unedited Kindle Notes",
         description="Count occurrences of 'location: ' in Obsidian vault markdown files.",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
-        settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
-        vault_path = _resolve_vault_path(ctx.config.settings, settings.config, ctx)
+        vault_path = _resolve_vault_path(ctx)
         count = count_location_occurrences(vault_path)
         return {"count": count, "vault_path": str(vault_path)}
 
 
-def _resolve_vault_path(shared: dict[str, Any], legacy: dict[str, Any], ctx: AutomationContext) -> Path:
-    path_raw = shared.get("vault_path") or legacy.get("vault_path")
+def _resolve_vault_path(ctx: AutomationContext) -> Path:
+    path_raw = ctx.config.settings.get("vault_path")
     if not path_raw:
         service_cfg = ctx.services.service_config("obsidian")
         path_raw = service_cfg.get("vault_path")

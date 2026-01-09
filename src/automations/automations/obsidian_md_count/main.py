@@ -14,12 +14,10 @@ class ObsidianMarkdownCountAutomation(Automation):
         id="obsidian_md_count",
         title="Obsidian Markdown Count",
         description="Count markdown files in the configured Obsidian vault.",
-        default_enabled=True,
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
-        settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
-        vault_path = _resolve_vault_path(ctx.config.settings, settings.config, ctx)
+        vault_path = _resolve_vault_path(ctx)
         total_count = count_markdown_files(vault_path)
         zk_count = count_zettelkasten_notes(vault_path)
         leaf_count = count_leaf_notes(vault_path)
@@ -37,8 +35,8 @@ class ObsidianMarkdownCountAutomation(Automation):
         }
 
 
-def _resolve_vault_path(shared: dict[str, Any], legacy: dict[str, Any], ctx: AutomationContext) -> Path:
-    path_raw = shared.get("vault_path") or legacy.get("vault_path")
+def _resolve_vault_path(ctx: AutomationContext) -> Path:
+    path_raw = ctx.config.settings.get("vault_path")
     if not path_raw:
         service_cfg = ctx.services.service_config("obsidian")
         path_raw = service_cfg.get("vault_path")
