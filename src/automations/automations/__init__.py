@@ -1,4 +1,5 @@
 from .base import Automation
+from .daily_repo_maintain import DailyRepoMaintainAutomation
 from .git_commit_tracker import GitCommitTrackerAutomation
 from .github_repo_count import GitHubRepoCountAutomation
 from .obsidian_md_count import ObsidianMarkdownCountAutomation
@@ -13,6 +14,7 @@ from .weekly_focus import WeeklyFocusAutomation
 
 __all__ = [
     "Automation",
+    "DailyRepoMaintainAutomation",
     "GitCommitTrackerAutomation",
     "GitHubRepoCountAutomation",
     "ObsidianMarkdownCountAutomation",
