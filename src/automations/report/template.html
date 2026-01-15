@@ -143,6 +143,12 @@
             color: #7bc96f;
             font-weight: bold;
         }
+
+        .focus-text {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 16px;
+        }
     </style>
 </head>
 <body>
@@ -178,6 +184,9 @@
                     </div>
                 </div>
             </div>
+            {% if focus %}
+            <div class="focus-text">focus: {{ focus }}</div>
+            {% endif %}
         </div>
 
         <!-- Right Column -->
@@ -203,7 +212,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="heatmap-row">
+                                <div class="heatmap-row">
                     <div class="heatmap-label">Portfolio Commits</div>
                     <div class="heatmap-value">
                         <span class="weekly-commit-check">{{ weekly_portfolio_commit }}</span>

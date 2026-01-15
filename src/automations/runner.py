@@ -143,6 +143,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     art_data = data_map.get("random_art", {})
     obs_edits_data = data_map.get("obsidian_edit_tracker", {})
     weekly_commit_data = data_map.get("weekly_commit_tracker", {})
+    weekly_focus_data = data_map.get("weekly_focus", {})
 
     # Convert daily_commits dict to list of 14 counts
     daily_commits = git_data.get("daily_commits", {})
@@ -172,6 +173,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         obs_edits_heatmap=obs_edits_heatmap,
         weekly_portfolio_commit=weekly_commit_data.get("portfolio_has_commits", False),
         weekly_main_commit=weekly_commit_data.get("main_has_commits", False),
+        focus=weekly_focus_data.get("focus", ""),
     )
 
 

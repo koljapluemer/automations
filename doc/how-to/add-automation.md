@@ -14,7 +14,6 @@ This project is designed for many small, independent automations. Each automatio
 
 3. **Add config**
    - Add any shared config keys in `config.yaml.demo` (top-level), if needed.
-   - Add your automation id to `enabled_automations` in `config.yaml.demo`.
    - Your automation should read shared config via `ctx.config.settings`.
 
 4. **Add to dashboard (optional)**
@@ -23,8 +22,7 @@ This project is designed for many small, independent automations. Each automatio
    - Update the Jinja2 template in `src/automations/report/template.html` to display your data.
 
 5. **Run & verify**
-   - `uv run automations --list` should show your automation.
-   - `uv run automations --only your_id` runs just your automation.
+   - `uv run automations` runs all automations.
 
 ## Skeleton example
 
@@ -43,12 +41,10 @@ class MyAutomation(Automation):
         id="my_automation",
         title="My Automation",
         description="What it does.",
-        default_enabled=True,
         # stage="post_report" if it needs the HTML output
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
-        settings = ctx.settings_for(self.spec.id, default_enabled=self.spec.default_enabled)
         # shared config values are under ctx.config.settings
         # do work here
         return {"my_data": 42, "status": "completed"}
@@ -57,9 +53,6 @@ class MyAutomation(Automation):
 ## Configuration pattern
 
 ```yaml
-enabled_automations:
-  - my_automation
-
 my_service_api_key: "..."
 my_automation_mode: "fast"
 ```

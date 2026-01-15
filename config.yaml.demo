@@ -13,3 +13,5 @@ report:
   screen_height: 1600
 
 wallpaper_output_image: "output/wallpaper.png"
+
+weekly_focus_file: "~/path/to/focus.txt"

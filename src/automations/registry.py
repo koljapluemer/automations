@@ -11,6 +11,7 @@ from .automations import (
     UneditedKindleNotesAutomation,
     WallpaperFromReportAutomation,
     WeeklyCommitTrackerAutomation,
+    WeeklyFocusAutomation,
 )
 from .automations.base import Automation
 
@@ -27,4 +28,5 @@ def load_automations() -> list[Automation]:
         UneditedKindleNotesAutomation(),
         WallpaperFromReportAutomation(),
         WeeklyCommitTrackerAutomation(),
+        WeeklyFocusAutomation(),
     ]
