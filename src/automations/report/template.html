@@ -22,7 +22,7 @@
 
         .container {
             display: grid;
-            grid-template-columns: auto 1fr;
+            grid-template-columns: auto auto 1fr;
             gap: 48px;
             padding: 64px;
             height: 100%;
@@ -149,6 +149,45 @@
             color: #94a3b8;
             margin-top: 16px;
         }
+
+        /* Progress Column */
+        .progress-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-title {
+            font-size: 10px;
+            color: #94a3b8;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #1e293b;
+            border-radius: 4px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .progress-segment {
+            height: 100%;
+        }
+
+        .progress-segment.older {
+            background: #64748b;
+        }
+
+        .progress-segment.week {
+            background: #5eead4;
+        }
+
+        .progress-segment.today {
+            background: #a78bfa;
+        }
     </style>
 </head>
 <body>
@@ -229,6 +268,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- Progress Column -->
+        {% if progress_bars %}
+        <div class="progress-column">
+            {% for bar in progress_bars %}
+            <div class="progress-item">
+                <div class="progress-title">{{ bar.title }}</div>
+                <div class="progress-bar">
+                    <div class="progress-segment older" style="width: {{ bar.older }}%;"></div>
+                    <div class="progress-segment week" style="width: {{ bar.week }}%;"></div>
+                    <div class="progress-segment today" style="width: {{ bar.today }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

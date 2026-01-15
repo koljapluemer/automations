@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 
 @dataclass
@@ -21,6 +22,7 @@ class DashboardDTO:
     weekly_main_commit: bool  # Main repo committed this week
     focus: str = ""  # Weekly focus item
     repo_to_maintain: str = ""  # Daily repo to maintain
+    progress_bars: list[dict[str, Any]] = field(default_factory=list)  # Progress to 100
 
     def to_dict(self) -> dict:
         """Convert to dict for Jinja2 template."""
@@ -48,6 +50,7 @@ class DashboardDTO:
             "weekly_main_commit": "✓" if self.weekly_main_commit else "",
             "focus": self.focus,
             "repo_to_maintain": self.repo_to_maintain,
+            "progress_bars": self.progress_bars,
         }
 
     def _get_color(self, commit_count: int, max_commits: int) -> str:

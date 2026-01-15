@@ -145,6 +145,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     weekly_commit_data = data_map.get("weekly_commit_tracker", {})
     weekly_focus_data = data_map.get("weekly_focus", {})
     daily_repo_data = data_map.get("daily_repo_maintain", {})
+    progress_data = data_map.get("progress_to_hundred", {})
 
     # Convert daily_commits dict to list of 14 counts
     daily_commits = git_data.get("daily_commits", {})
@@ -176,6 +177,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         weekly_main_commit=weekly_commit_data.get("main_has_commits", False),
         focus=weekly_focus_data.get("focus", ""),
         repo_to_maintain=daily_repo_data.get("repo", ""),
+        progress_bars=progress_data.get("bars", []),
     )
 
 
