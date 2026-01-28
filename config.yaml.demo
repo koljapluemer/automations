@@ -14,4 +14,6 @@ report:
 
 wallpaper_output_image: "output/wallpaper.png"
 
+project_cards_output_folder: "output/project_cards"
+
 weekly_focus_file: "~/path/to/focus.txt"
