@@ -22,7 +22,7 @@
 
         .container {
             display: grid;
-            grid-template-columns: auto auto 1fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 48px;
             padding: 64px;
             height: 100%;
@@ -231,7 +231,7 @@
             {% endif %}
         </div>
 
-        <!-- Right Column -->
+        <!-- Second Column -->
         <div class="right-column">
             <div class="heatmap-table">
                 <div class="heatmap-row">
@@ -254,7 +254,7 @@
                         </div>
                     </div>
                 </div>
-                                <div class="heatmap-row">
+                <div class="heatmap-row">
                     <div class="heatmap-label">Portfolio Commits</div>
                     <div class="heatmap-value">
                         <span class="weekly-commit-check">{{ weekly_portfolio_commit }}</span>
@@ -282,6 +282,15 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Fourth Column: Project Card -->
+        {% if project_card_image_path %}
+        <div>
+            <img src="file://{{ project_card_image_path }}"
+                 alt="Project card"
+                 style="width: 100%; display: block; border-radius: 12px;">
         </div>
         {% endif %}
     </div>

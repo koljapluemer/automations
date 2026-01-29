@@ -8,15 +8,21 @@ Requires-Dist: pyyaml>=6.0
 Requires-Dist: requests>=2.31
 Requires-Dist: markdown>=3.6
 Requires-Dist: jinja2>=3.1
+Requires-Dist: pillow>=12.1.0
 
 # automations
 
-Personal automation runner.
+Personal automation runner with dashboard generation.
 
 ## Quick start
 
 - Copy `config.yaml.demo` to `config.yaml` and fill in values.
 - Run with `uv run automations`.
+- Dashboard is rendered to `output/stats.html` and optionally set as wallpaper.
+
+## Architecture
+
+Automations return data → DTO → Jinja2 template → HTML dashboard. Each automation is independent and only returns data from its `run()` method.
 
 ## Ubuntu dependencies
 
