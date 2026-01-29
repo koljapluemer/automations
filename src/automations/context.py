@@ -17,3 +17,4 @@ class AutomationContext:
     run_date: date
     run_id: str
     report_path: Path | None = None
+    force_flags: frozenset[str] = frozenset()

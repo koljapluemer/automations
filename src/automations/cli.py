@@ -13,6 +13,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="config.yaml",
         help="Config file name in project root (default: config.yaml)",
     )
+    parser.add_argument(
+        "--force-zk-deploy",
+        action="store_true",
+        help="Force zk portfolio deployment even if already run today",
+    )
     return parser
 
 
@@ -20,8 +25,12 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
 
+    force_flags: set[str] = set()
+    if args.force_zk_deploy:
+        force_flags.add("zk_deploy")
+
     config = load_config(filename=args.config)
-    summary = run_automations(config)
+    summary = run_automations(config, force_flags=frozenset(force_flags))
     _print_summary(summary)
     return 0
 

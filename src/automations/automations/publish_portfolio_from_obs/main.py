@@ -21,6 +21,14 @@ class PublishPortfolioFromObsAutomation(Automation):
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
+        # Check if already deployed today (unless force flag is set)
+        force = "zk_deploy" in ctx.force_flags
+        if not force:
+            cached = _load_cached_result(ctx, self.spec.id)
+            if cached is not None:
+                cached["cached"] = True
+                return cached
+
         _ensure_portfolio_path()
         _ensure_obsidian_cli()
 
@@ -34,10 +42,10 @@ class PublishPortfolioFromObsAutomation(Automation):
             cwd=PORTFOLIO_PATH,
         )
         if not committed:
-            return {"status": "no_changes"}
+            return {"status": "no_changes", "cached": False}
         _run_command(["git", "push"], cwd=PORTFOLIO_PATH)
 
-        return {"status": "updated", "timestamp": timestamp}
+        return {"status": "updated", "timestamp": timestamp, "cached": False}
 
 
 def _ensure_portfolio_path() -> None:
@@ -86,3 +94,19 @@ def _run_commit(cmd: list[str], cwd: Path) -> bool:
 def _is_nothing_to_commit(output: str) -> bool:
     lowered = output.lower()
     return "nothing to commit" in lowered or "no changes added to commit" in lowered
+
+
+def _load_cached_result(ctx: AutomationContext, automation_id: str) -> dict[str, Any] | None:
+    """Return cached result if this automation already ran successfully today."""
+    latest = ctx.log.latest_event(automation_id, "result")
+    if not latest:
+        return None
+    if latest.get("status") != "ok":
+        return None
+    payload = latest.get("payload")
+    if not isinstance(payload, dict):
+        return None
+    status = payload.get("status")
+    if status in ("updated", "no_changes"):
+        return {"status": status, "timestamp": payload.get("timestamp")}
+    return None

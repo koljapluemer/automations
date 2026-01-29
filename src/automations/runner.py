@@ -13,7 +13,10 @@ from .report.html import render_dashboard
 from .services.registry import ServiceRegistry
 
 
-def run_automations(config: AppConfig) -> RunSummary:
+def run_automations(
+    config: AppConfig,
+    force_flags: frozenset[str] = frozenset(),
+) -> RunSummary:
     run_date = date.today()
     run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -26,6 +29,7 @@ def run_automations(config: AppConfig) -> RunSummary:
         log=log,
         run_date=run_date,
         run_id=run_id,
+        force_flags=force_flags,
     )
 
     automations = load_automations()
@@ -53,6 +57,7 @@ def run_automations(config: AppConfig) -> RunSummary:
             run_date=run_date,
             run_id=run_id,
             report_path=report_path,
+            force_flags=force_flags,
         )
 
     for automation in post_report:
