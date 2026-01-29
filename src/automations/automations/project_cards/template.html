@@ -41,6 +41,13 @@
     line-height: 1.3;
     word-break: break-word;
   }
+  .description {
+    font-size: {{ desc_font_size }}px;
+    text-align: left;
+    margin-top: 0.5em;
+    line-height: 1.4;
+    opacity: 0.85;
+  }
 </style>
 </head>
 <body>
@@ -50,6 +57,9 @@
   </div>
   <div class="title-area">
     <h1>{{ title }}</h1>
+    {% if description %}
+    <p class="description">{{ description }}</p>
+    {% endif %}
   </div>
 </div>
 </body>

@@ -19,6 +19,8 @@ from ...models import AutomationSpec
 
 IMAGE_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
+DESCRIPTION_RE = re.compile(r"^- \*\*(.+?)\*\*\s*$", re.MULTILINE)
+OBSIDIAN_LINK_RE = re.compile(r"\[\[(?:[^\]|]+\|)?([^\]]+)\]\]")
 
 CARD_WIDTH = 1772   # 15cm at 300 DPI
 CARD_HEIGHT = 1181  # 10cm at 300 DPI
@@ -55,15 +57,27 @@ class ProjectCardsAutomation(Automation):
                 skipped += 1
                 continue
 
-            title = _extract_title(content, note.stem.lstrip("⌬").strip())
+            metadata = _extract_metadata(content, note.stem.lstrip("⌬").strip())
+            title = metadata["title"]
             valid_titles.add(title)
 
             # HTML/JSON export
             dest_image = html_output_folder / image_path.name
             shutil.copy2(image_path, dest_image)
+            json_data: dict[str, Any] = {"title": title, "image": image_path.name}
+            if metadata.get("description"):
+                json_data["description"] = metadata["description"]
+            if metadata.get("archived"):
+                json_data["archived"] = True
+            if metadata.get("showcase"):
+                json_data["showcase"] = True
+            if metadata.get("failed"):
+                json_data["failed"] = metadata["failed"]
+            if metadata.get("links"):
+                json_data["links"] = metadata["links"]
             json_path = html_output_folder / f"{title}.json"
             json_path.write_text(
-                json.dumps({"title": title, "image": image_path.name}, indent=2),
+                json.dumps(json_data, indent=2),
                 encoding="utf-8",
             )
 
@@ -79,9 +93,11 @@ class ProjectCardsAutomation(Automation):
             html = template.render(
                 image_uri=image_uri,
                 title=title,
+                description=metadata.get("description", ""),
                 width=CARD_WIDTH,
                 height=CARD_HEIGHT,
                 font_size=round(CARD_WIDTH * 0.04),
+                desc_font_size=round(CARD_WIDTH * 0.025),
             )
 
             html_path = output_folder / f".{title}.tmp.html"
@@ -126,17 +142,58 @@ def _resolve_output_folder(ctx: AutomationContext, key: str, default: str) -> Pa
     return path
 
 
-def _extract_title(content: str, fallback: str) -> str:
-    match = FRONTMATTER_RE.match(content)
-    if not match:
-        return fallback
-    frontmatter = match.group(1)
-    for line in frontmatter.splitlines():
-        if line.startswith("title:"):
-            value = line[6:].strip().strip('"').strip("'")
-            if value:
-                return value
-    return fallback
+def _extract_metadata(content: str, fallback_title: str) -> dict[str, Any]:
+    result: dict[str, Any] = {"title": fallback_title}
+
+    # Parse frontmatter
+    fm_match = FRONTMATTER_RE.match(content)
+    if fm_match:
+        frontmatter = fm_match.group(1)
+        in_links = False
+        links: dict[str, str] = {}
+
+        for line in frontmatter.splitlines():
+            if line.startswith("title:"):
+                value = line[6:].strip().strip('"').strip("'")
+                if value:
+                    result["title"] = value
+            elif line.startswith("archived:"):
+                value = line[9:].strip().lower()
+                if value == "true":
+                    result["archived"] = True
+            elif line.startswith("showcase:"):
+                value = line[9:].strip().lower()
+                if value == "true":
+                    result["showcase"] = True
+            elif line.startswith("failed:"):
+                value = line[7:].strip()
+                if value:
+                    result["failed"] = value
+            elif line.startswith("links:"):
+                in_links = True
+            elif in_links and line.startswith("  "):
+                # Parse nested link entry like "  Website: https://..."
+                link_line = line.strip()
+                if ":" in link_line:
+                    key, url = link_line.split(":", 1)
+                    # Replace dashes with spaces in key
+                    key = key.replace("-", " ").strip()
+                    links[key] = url.strip()
+            elif in_links and not line.startswith(" "):
+                in_links = False
+
+        if links:
+            result["links"] = links
+
+    # Parse description from body (first line starting with "- **")
+    desc_match = DESCRIPTION_RE.search(content)
+    if desc_match:
+        raw_desc = desc_match.group(1)
+        # Strip Obsidian link syntax: [[link|alias]] -> alias, [[link]] -> link
+        clean_desc = OBSIDIAN_LINK_RE.sub(r"\1", raw_desc)
+        result["description"] = clean_desc.strip()
+
+    return result
 
 
 def _is_exact_dimensions(path: Path, width: int, height: int) -> bool:
