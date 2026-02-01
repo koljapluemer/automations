@@ -4,15 +4,13 @@ from pathlib import Path
 
 
 def count_markdown_files(vault_path: Path) -> int:
+    """Count markdown files directly in the vault directory (not in subfolders)."""
     if not vault_path.exists():
         raise FileNotFoundError(f"Obsidian vault path does not exist: {vault_path}")
     if not vault_path.is_dir():
         raise NotADirectoryError(f"Obsidian vault path is not a directory: {vault_path}")
 
-    return sum(
-        1 for path in vault_path.rglob("*.md")
-        if path.is_file() and not any(part.startswith(".") for part in path.relative_to(vault_path).parts[:-1])
-    )
+    return sum(1 for path in vault_path.glob("*.md") if path.is_file())
 
 
 def count_location_occurrences(vault_path: Path) -> int:
@@ -39,15 +37,15 @@ def count_location_occurrences(vault_path: Path) -> int:
 
 
 def count_zettelkasten_notes(vault_path: Path) -> int:
-    """Count markdown files containing 'zk-id:' (excludes hidden directories)."""
+    """Count markdown files containing 'zk-id:' directly in the vault directory."""
     if not vault_path.exists():
         raise FileNotFoundError(f"Obsidian vault path does not exist: {vault_path}")
     if not vault_path.is_dir():
         raise NotADirectoryError(f"Obsidian vault path is not a directory: {vault_path}")
 
     count = 0
-    for path in vault_path.rglob("*.md"):
-        if not path.is_file() or any(part.startswith(".") for part in path.relative_to(vault_path).parts[:-1]):
+    for path in vault_path.glob("*.md"):
+        if not path.is_file():
             continue
 
         try:
@@ -61,15 +59,15 @@ def count_zettelkasten_notes(vault_path: Path) -> int:
 
 
 def count_leaf_notes(vault_path: Path) -> int:
-    """Count markdown files NOT containing '[[' (excludes hidden directories)."""
+    """Count markdown files NOT containing '[[' directly in the vault directory."""
     if not vault_path.exists():
         raise FileNotFoundError(f"Obsidian vault path does not exist: {vault_path}")
     if not vault_path.is_dir():
         raise NotADirectoryError(f"Obsidian vault path is not a directory: {vault_path}")
 
     count = 0
-    for path in vault_path.rglob("*.md"):
-        if not path.is_file() or any(part.startswith(".") for part in path.relative_to(vault_path).parts[:-1]):
+    for path in vault_path.glob("*.md"):
+        if not path.is_file():
             continue
 
         try:
