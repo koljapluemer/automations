@@ -18,6 +18,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Force zk portfolio deployment even if already run today",
     )
+    parser.add_argument(
+        "--force-github",
+        action="store_true",
+        help="Force GitHub repo count automation even if already run today",
+    )
     return parser
 
 
@@ -28,6 +33,8 @@ def main() -> int:
     force_flags: set[str] = set()
     if args.force_zk_deploy:
         force_flags.add("zk_deploy")
+    if args.force_github:
+        force_flags.add("github")
 
     config = load_config(filename=args.config)
     summary = run_automations(config, force_flags=frozenset(force_flags))

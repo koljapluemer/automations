@@ -41,6 +41,12 @@ For GNOME wallpaper updates, `gsettings` comes with GNOME. Make sure you are run
 uv run automations --force-zk-deploy
 ```
 
+- The GitHub repo count automation runs at most once per day. Use `--force-github` to force a rerun (useful when `vault_repo_folder` is configured to regenerate repo notes):
+
+```bash
+uv run automations --force-github
+```
+
 ## Manual runs
 
 Run just the portfolio publisher automation:
