@@ -18,19 +18,20 @@ class ProgressToHundredAutomation(Automation):
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
-        vault_path = ctx.config.settings.get("vault_path")
-        if not vault_path:
+        folder_path = ctx.config.settings.get("progress_to_hundred_path")
+        if not folder_path:
             return {"bars": []}
 
-        vault = Path(vault_path).expanduser().resolve()
-        if not vault.exists():
+        folder = Path(folder_path).expanduser().resolve()
+        if not folder.exists():
             return {"bars": []}
 
         bars = []
-        for md_file in vault.rglob("◩*.md"):
-            bar_data = _parse_progress_file(md_file, ctx.run_date)
-            if bar_data:
-                bars.append(bar_data)
+        for pattern in ("◩*.md", "◩*.txt"):
+            for file in folder.rglob(pattern):
+                bar_data = _parse_progress_file(file, ctx.run_date)
+                if bar_data:
+                    bars.append(bar_data)
 
         return {"bars": bars}
 
@@ -74,8 +75,6 @@ def _parse_progress_file(file_path: Path, run_date: date) -> dict[str, Any] | No
             older_count += 1
 
     total = older_count + week_count + today_count
-    if total == 0:
-        return None
 
     return {
         "title": title,

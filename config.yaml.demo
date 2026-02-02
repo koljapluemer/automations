@@ -18,3 +18,5 @@ project_cards_output_folder: "output/project_cards"
 project_cards_html_output: "output/project_cards_html"
 
 weekly_focus_file: "~/path/to/focus.txt"
+
+progress_to_hundred_path: "~/path/to/progress-folder"
