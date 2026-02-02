@@ -115,9 +115,13 @@ class ProjectCardsAutomation(Automation):
         card_files = sorted(output_folder.glob("*.png"))
         random_card = str(random.choice(card_files)) if card_files else ""
 
+        total_projects = generated + skipped
+
         return {
             "cards_generated": generated,
             "cards_skipped": skipped,
+            "projects_total": total_projects,
+            "projects_valid": generated,
             "output_folder": str(output_folder),
             "html_output_folder": str(html_output_folder),
             "random_card_path": random_card,

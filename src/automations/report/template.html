@@ -229,6 +229,20 @@
             {% if repo_to_maintain %}
             <div class="focus-text">maintain: {{ repo_to_maintain }}</div>
             {% endif %}
+
+            {% if projects_total > 0 %}
+            <div class="stats-table" style="margin-top: 16px;">
+                <div class="stats-grid">
+                    <div class="stat-row">
+                        <div class="stat-label">Project Cards</div>
+                        <div class="stat-value">{{ projects_valid }} / {{ projects_total }}</div>
+                    </div>
+                </div>
+                <div class="progress-bar" style="margin-top: 12px;">
+                    <div class="progress-segment older" style="width: {{ (projects_valid / projects_total * 100)|round(1) }}%;"></div>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Second Column -->

@@ -185,6 +185,8 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         repo_to_maintain=daily_repo_data.get("repo", ""),
         progress_bars=progress_data.get("bars", []),
         project_card_image_path=project_cards_data.get("random_card_path", ""),
+        projects_total=project_cards_data.get("projects_total", 0),
+        projects_valid=project_cards_data.get("projects_valid", 0),
     )
 
 
