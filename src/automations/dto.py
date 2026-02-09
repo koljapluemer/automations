@@ -16,11 +16,11 @@ class DashboardDTO:
     vault_notes: int
     zk_percentage: float
     leaf_percentage: float
-    location_count: int = 0  # Unedited Kindle notes (location: occurrences)
     commit_heatmap: list[int]  # 14 days of commit counts
     obs_edits_heatmap: list[int]  # 14 days of obsidian edit counts
     weekly_portfolio_commit: bool  # Portfolio repo committed this week
     weekly_main_commit: bool  # Main repo committed this week
+    location_count: int = 0  # Unedited Kindle notes (location: occurrences)
     focus: str = ""  # Weekly focus item
     repo_to_maintain: str = ""  # Daily repo to maintain
     progress_bars: list[dict[str, Any]] = field(default_factory=list)  # Progress to 100
