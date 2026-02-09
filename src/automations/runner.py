@@ -148,6 +148,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     art_data = data_map.get("random_art", {})
     obs_edits_data = data_map.get("obsidian_edit_tracker", {})
     weekly_commit_data = data_map.get("weekly_commit_tracker", {})
+    kindle_data = data_map.get("unedited_kindle_notes", {})
     weekly_focus_data = data_map.get("weekly_focus", {})
     daily_repo_data = data_map.get("daily_repo_maintain", {})
     progress_data = data_map.get("progress_to_hundred", {})
@@ -177,6 +178,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         vault_notes=obsidian_data.get("count", 0),
         zk_percentage=obsidian_data.get("zk_percentage", 0.0),
         leaf_percentage=obsidian_data.get("leaf_percentage", 0.0),
+        location_count=kindle_data.get("count", 0),
         commit_heatmap=commit_heatmap,
         obs_edits_heatmap=obs_edits_heatmap,
         weekly_portfolio_commit=weekly_commit_data.get("portfolio_has_commits", False),

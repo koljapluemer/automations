@@ -16,6 +16,7 @@ class DashboardDTO:
     vault_notes: int
     zk_percentage: float
     leaf_percentage: float
+    location_count: int = 0  # Unedited Kindle notes (location: occurrences)
     commit_heatmap: list[int]  # 14 days of commit counts
     obs_edits_heatmap: list[int]  # 14 days of obsidian edit counts
     weekly_portfolio_commit: bool  # Portfolio repo committed this week
@@ -45,6 +46,7 @@ class DashboardDTO:
             "vault_notes": self.vault_notes,
             "zk_percentage": f"{self.zk_percentage:.1f}%",
             "leaf_percentage": f"{self.leaf_percentage:.1f}%",
+            "location_count": self.location_count,
             "commit_heatmap": self.commit_heatmap,
             "heatmap_colors": heatmap_colors,
             "obs_edits_heatmap": self.obs_edits_heatmap,
