@@ -25,8 +25,6 @@ src/automations/automations/github_repo_count/__init__.py
 src/automations/automations/github_repo_count/main.py
 src/automations/automations/obsidian_edit_tracker/__init__.py
 src/automations/automations/obsidian_edit_tracker/main.py
-src/automations/automations/obsidian_essay_to_website/__init__.py
-src/automations/automations/obsidian_essay_to_website/main.py
 src/automations/automations/obsidian_md_count/__init__.py
 src/automations/automations/obsidian_md_count/main.py
 src/automations/automations/progress_to_hundred/__init__.py
@@ -37,6 +35,8 @@ src/automations/automations/publish_portfolio_from_obs/__init__.py
 src/automations/automations/publish_portfolio_from_obs/main.py
 src/automations/automations/random_art/__init__.py
 src/automations/automations/random_art/main.py
+src/automations/automations/telegram_idea/__init__.py
+src/automations/automations/telegram_idea/main.py
 src/automations/automations/unedited_kindle_notes/__init__.py
 src/automations/automations/unedited_kindle_notes/main.py
 src/automations/automations/wallpaper_from_report/__init__.py
