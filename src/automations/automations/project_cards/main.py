@@ -54,12 +54,14 @@ class ProjectCardsAutomation(Automation):
             image_path = _find_first_image(content, vault_media_path, note.parent, vault_path)
 
             if image_path is None or not _is_exact_dimensions(image_path, 1920, 1080):
+                _set_frontmatter_published(note, False)
                 skipped += 1
                 continue
 
             metadata = _extract_metadata(content, note.stem.lstrip("⌬").strip())
             title = metadata["title"]
             valid_titles.add(title)
+            _set_frontmatter_published(note, True)
 
             # HTML/JSON export
             dest_image = html_output_folder / image_path.name
@@ -198,6 +200,32 @@ def _extract_metadata(content: str, fallback_title: str) -> dict[str, Any]:
         result["description"] = clean_desc.strip()
 
     return result
+
+
+def _set_frontmatter_published(note: Path, published: bool) -> None:
+    content = note.read_text(encoding="utf-8")
+    value = "true" if published else "false"
+    published_line = f"published: {value}"
+
+    fm_match = FRONTMATTER_RE.match(content)
+    if fm_match:
+        lines = fm_match.group(1).splitlines()
+        new_lines = []
+        found = False
+        for line in lines:
+            if line.startswith("published:"):
+                new_lines.append(published_line)
+                found = True
+            else:
+                new_lines.append(line)
+        if not found:
+            new_lines.append(published_line)
+        new_frontmatter = "\n".join(new_lines)
+        new_content = content[: fm_match.start(1)] + new_frontmatter + content[fm_match.end(1) :]
+    else:
+        new_content = f"---\n{published_line}\n---\n" + content
+
+    note.write_text(new_content, encoding="utf-8")
 
 
 def _is_exact_dimensions(path: Path, width: int, height: int) -> bool:
