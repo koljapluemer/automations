@@ -37,7 +37,7 @@ class ProjectCommandCenterAutomation(Automation):
             img = output_img_folder / f"{project['id']}.webp"
             if img.exists():
                 projects_with_image.append({
-                    "name": project["name"],
+                    "title": project.get("title", project["id"]),
                     "image_path": str(img),
                 })
 
@@ -63,7 +63,7 @@ class ProjectCommandCenterAutomation(Automation):
         return {
             "projects_total": len(projects),
             "projects_with_image": len(projects_with_image),
-            "random_project_name": random_project.get("name", ""),
+            "random_project_name": random_project.get("title", ""),
             "random_project_image_path": random_project.get("image_path", ""),
             "local_repo_count": local_repo_count,
         }
@@ -80,10 +80,9 @@ def _read_projects(data_folder: Path) -> list[dict[str, Any]]:
             doc = json.loads(path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             continue
-        if not isinstance(doc, dict) or doc.get("type") != "project":
+        if not isinstance(doc, dict):
             continue
-        if "id" not in doc:
-            doc = {"id": path.stem, **doc}
+        doc["id"] = path.stem
         projects.append(doc)
     return projects
 
@@ -101,11 +100,11 @@ def _generate_overview(
     # Pass 1: read project definitions from data folder
     project_defs: dict[str, dict[str, Any]] = {}
     for project in _read_projects(data_folder):
-        pid = project.get("id") or Path(data_folder).stem
+        pid = project["id"]
         img = output_img_folder / f"{pid}.webp"
         project_defs[pid] = {
             "id": pid,
-            "name": project["name"],
+            "title": project.get("title", pid),
             "description": project.get("description", ""),
             "image_path": str(img) if img.exists() else "",
             "repos": [],
