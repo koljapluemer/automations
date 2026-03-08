@@ -67,8 +67,15 @@ class ProjectCommandCenterAutomation(Automation):
             project_id = doc["id"]
             project_name = doc["name"]
 
+            output_doc = {
+                "type": "project",
+                "name": project_name,
+                "description": doc["description"],
+                "rows": 2,
+                "cols": 2,
+            }
             dest = output_data_folder / f"{project_id}.json"
-            dest.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
+            dest.write_text(json.dumps(output_doc, indent=2, ensure_ascii=False), encoding="utf-8")
 
             img_result = "none"
             readme = repo_dir / "README.md"
