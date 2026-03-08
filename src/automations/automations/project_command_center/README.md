@@ -4,7 +4,7 @@ Reads project definitions from `project_output_data_folder`, cross-references re
 
 ## Data model
 
-**Projects** are defined by hand-maintained `*.json` files in `project_output_data_folder` with `"type": "project"`. The automation reads these as the authoritative source — it never writes to this folder.
+**Projects** are defined by hand-maintained `*.json` files in `project_output_data_folder`. The automation reads these as the authoritative source — it never writes to this folder.
 
 **Images** are pre-existing `.webp` files in `project_data_output_img_folder`, named `$id.webp`. The automation reads them — it never writes to this folder either.
 
@@ -19,7 +19,7 @@ Relationships are many-to-many — a repo can belong to multiple projects, a pro
 ## What it does
 
 1. Counts top-level dirs in `git_project_folder` → feeds "Active Repos" on the dashboard
-2. Reads all `*.json` files with `"type": "project"` from `project_output_data_folder`, validates against schema
+2. Reads all `*.json` files from `project_output_data_folder`, validates against schema
 3. For each project, checks if `$id.webp` exists in the img folder
 4. Picks a random project with an image for the dashboard wallpaper
 5. Generates the overview HTML (if `project_overview_html` is configured)
@@ -41,4 +41,4 @@ Two sections:
 
 ## Schema
 
-`project_json_schema.json` — JSON Schema (draft 2020-12). Required fields: `id`, `name`, `description` (all strings). `type` must be `"project"`. Additional properties allowed.
+`project_json_schema.json` — JSON Schema (draft 2020-12). Required fields: `id`, `name`, `description` (all strings). Additional properties allowed.

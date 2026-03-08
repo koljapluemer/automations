@@ -6,7 +6,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-import jsonschema
 from jinja2 import Environment, FileSystemLoader
 
 from ..base import Automation
@@ -14,11 +13,6 @@ from ...context import AutomationContext
 from ...models import AutomationSpec
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+)$", re.MULTILINE)
-
-_SCHEMA_PATH = Path(__file__).parent / "project_json_schema.json"
-_SCHEMA: dict[str, Any] = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
-
-IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".tiff", ".tif", ".avif"}
 
 
 class ProjectCommandCenterAutomation(Automation):
@@ -88,13 +82,8 @@ def _read_projects(data_folder: Path) -> list[dict[str, Any]]:
             continue
         if not isinstance(doc, dict) or doc.get("type") != "project":
             continue
-        # Inject id from filename if missing, for schema validation
         if "id" not in doc:
             doc = {"id": path.stem, **doc}
-        try:
-            jsonschema.validate(doc, _SCHEMA)
-        except jsonschema.ValidationError:
-            continue
         projects.append(doc)
     return projects
 
