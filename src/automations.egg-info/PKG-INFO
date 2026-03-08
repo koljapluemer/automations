@@ -9,6 +9,7 @@ Requires-Dist: requests>=2.31
 Requires-Dist: markdown>=3.6
 Requires-Dist: jinja2>=3.1
 Requires-Dist: pillow>=12.1.0
+Requires-Dist: jsonschema>=4.0
 
 # automations
 

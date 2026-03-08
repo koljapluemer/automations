@@ -1,0 +1,4 @@
+1) loop top level folders in `git_project_folder` (see `config.yaml`)
+2) in each, check if in the repo folder, the file `doc.json` exists and if so, conforms to `src/automations/automations/project-command-center/project_json_schema.json` (otherwise ignore)
+3) if valid, copy the file to `project_output_data_folder` (setting need to be added). But don't name it `project.json`, name it `$id.json`
+4) check if the README.md of the repo contains an image (by looking for `![]()` style links with valid image endings). If so, copy first occuring image to `project_data_output_img_folder`, also with name `$id.webp` (if it's not webp, convert it)
