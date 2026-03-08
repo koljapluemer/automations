@@ -3,7 +3,6 @@ from __future__ import annotations
 from .automations import (
     DailyRepoMaintainAutomation,
     GitCommitTrackerAutomation,
-    GitHubRepoCountAutomation,
     ObsidianMarkdownCountAutomation,
     ObsidianEditTrackerAutomation,
     ProjectCommandCenterAutomation,
@@ -23,7 +22,6 @@ def load_automations() -> list[Automation]:
     return [
         DailyRepoMaintainAutomation(),
         GitCommitTrackerAutomation(),
-        GitHubRepoCountAutomation(),
         ObsidianMarkdownCountAutomation(),
         ObsidianEditTrackerAutomation(),
         ProjectCommandCenterAutomation(),

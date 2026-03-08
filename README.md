@@ -41,7 +41,7 @@ For GNOME wallpaper updates, `gsettings` comes with GNOME. Make sure you are run
 uv run automations --force-zk-deploy
 ```
 
-- The GitHub repo count automation runs at most once per day. Use `--force-github` to force a rerun (useful when `vault_repo_folder` is configured to regenerate repo notes):
+- The GitHub API fetch (part of `project_command_center`) runs at most once per day. Use `--force-github` to force a rerun (useful when `vault_repo_folder` is configured to regenerate repo notes, or to re-scaffold `doc/project.json` files):
 
 ```bash
 uv run automations --force-github

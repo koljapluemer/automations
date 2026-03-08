@@ -143,7 +143,6 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
 
     # Extract data from specific automations with fallbacks
     git_data = data_map.get("git_commit_tracker", {})
-    github_data = data_map.get("github_repo_count", {})
     obsidian_data = data_map.get("obsidian_md_count", {})
     art_data = data_map.get("random_art", {})
     obs_edits_data = data_map.get("obsidian_edit_tracker", {})
@@ -174,7 +173,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         generated_at=generated_at,
         artwork_image_path=art_data.get("image_path", ""),
         artwork_filename=art_data.get("image_name", "N/A"),
-        active_repos=github_data.get("active_count", 0),
+        active_repos=project_command_center_data.get("active_count", 0),
         vault_notes=obsidian_data.get("count", 0),
         zk_percentage=obsidian_data.get("zk_percentage", 0.0),
         leaf_percentage=obsidian_data.get("leaf_percentage", 0.0),

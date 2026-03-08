@@ -21,7 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--force-github",
         action="store_true",
-        help="Force GitHub repo count automation even if already run today",
+        help="Force GitHub API fetch in project_command_center even if already run today",
     )
     return parser
 
