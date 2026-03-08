@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from pathlib import Path
 from typing import Any
 
 from ..base import Automation
@@ -12,7 +13,7 @@ class DailyRepoMaintainAutomation(Automation):
     spec = AutomationSpec(
         id="daily_repo_maintain",
         title="Daily Repo to Maintain",
-        description="Select a random active repo to maintain each day.",
+        description="Select a random local repo to maintain each day.",
     )
 
     def run(self, ctx: AutomationContext) -> dict[str, Any]:
@@ -20,19 +21,15 @@ class DailyRepoMaintainAutomation(Automation):
         if cached:
             return {"repo": cached.get("repo", ""), "cached": True}
 
-        shared = ctx.config.settings
-        service_cfg = ctx.services.service_config("github")
-        username = shared.get("github_username") or service_cfg.get("username")
-        token = shared.get("github_token") or service_cfg.get("token")
-        if not username or not token:
+        git_project_folder_raw = ctx.config.settings.get("git_project_folder")
+        if not git_project_folder_raw:
             return {"repo": ""}
 
-        client = ctx.services.github_client(username=str(username), token=str(token))
-        repos = client.list_active_repos()
+        git_project_folder = Path(str(git_project_folder_raw)).expanduser()
+        repos = [p.name for p in sorted(git_project_folder.iterdir()) if p.is_dir()]
         if not repos:
             return {"repo": ""}
 
         chosen = random.choice(repos)
-        repo_name = chosen.get("name", "")
-        ctx.log.append(self.spec.id, "repo_chosen", {"repo": repo_name})
-        return {"repo": repo_name, "cached": False}
+        ctx.log.append(self.spec.id, "repo_chosen", {"repo": chosen})
+        return {"repo": chosen, "cached": False}

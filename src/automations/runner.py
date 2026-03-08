@@ -173,7 +173,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         generated_at=generated_at,
         artwork_image_path=art_data.get("image_path", ""),
         artwork_filename=art_data.get("image_name", "N/A"),
-        active_repos=project_command_center_data.get("active_count", 0),
+        active_repos=project_command_center_data.get("local_repo_count", 0),
         vault_notes=obsidian_data.get("count", 0),
         zk_percentage=obsidian_data.get("zk_percentage", 0.0),
         leaf_percentage=obsidian_data.get("leaf_percentage", 0.0),
