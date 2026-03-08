@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 import re
 import shutil
 from pathlib import Path
@@ -37,6 +38,7 @@ class ProjectCommandCenterAutomation(Automation):
         processed = 0
         skipped = 0
         images_copied = 0
+        projects_with_image: list[dict[str, str]] = []
 
         for repo_dir in sorted(git_project_folder.iterdir()):
             if not repo_dir.is_dir():
@@ -44,14 +46,14 @@ class ProjectCommandCenterAutomation(Automation):
 
             doc_path = repo_dir / "doc/project.json"
             if not doc_path.exists():
-                ctx.log.append(self.spec.id, "skip", {"repo": repo_dir.name, "reason": "no doc.json"})
+                ctx.log.append(self.spec.id, "skip", {"repo": repo_dir.name, "reason": "no doc/project.json"})
                 skipped += 1
                 continue
 
             try:
                 doc = json.loads(doc_path.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, OSError) as e:
-                ctx.log.append(self.spec.id, "skip", {"repo": repo_dir.name, "reason": f"doc.json parse error: {e}"})
+                ctx.log.append(self.spec.id, "skip", {"repo": repo_dir.name, "reason": f"parse error: {e}"})
                 skipped += 1
                 continue
 
@@ -63,6 +65,7 @@ class ProjectCommandCenterAutomation(Automation):
                 continue
 
             project_id = doc["id"]
+            project_name = doc["name"]
 
             dest = output_data_folder / f"{project_id}.json"
             dest.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -76,24 +79,32 @@ class ProjectCommandCenterAutomation(Automation):
                     _copy_as_webp(img_src, dest_img)
                     images_copied += 1
                     img_result = img_src.name
+                    projects_with_image.append({"name": project_name, "image_path": str(dest_img)})
 
             ctx.log.append(self.spec.id, "processed", {
                 "repo": repo_dir.name,
                 "id": project_id,
+                "name": project_name,
                 "image": img_result,
             })
             processed += 1
+
+        # Pick a random project with image for the dashboard
+        random_project = random.choice(projects_with_image) if projects_with_image else {}
 
         ctx.log.append(self.spec.id, "result", {
             "projects_processed": processed,
             "projects_skipped": skipped,
             "images_copied": images_copied,
+            "random_project": random_project,
         })
 
         return {
             "projects_processed": processed,
             "projects_skipped": skipped,
             "images_copied": images_copied,
+            "random_project_name": random_project.get("name", ""),
+            "random_project_image_path": random_project.get("image_path", ""),
         }
 
 

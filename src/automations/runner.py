@@ -152,7 +152,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     weekly_focus_data = data_map.get("weekly_focus", {})
     daily_repo_data = data_map.get("daily_repo_maintain", {})
     progress_data = data_map.get("progress_to_hundred", {})
-    project_cards_data = data_map.get("project_cards", {})
+    project_command_center_data = data_map.get("project_command_center", {})
 
     # Convert daily_commits dict to list of 14 counts
     daily_commits = git_data.get("daily_commits", {})
@@ -186,9 +186,8 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         focus=weekly_focus_data.get("focus", ""),
         repo_to_maintain=daily_repo_data.get("repo", ""),
         progress_bars=progress_data.get("bars", []),
-        project_card_image_path=project_cards_data.get("random_card_path", ""),
-        projects_total=project_cards_data.get("projects_total", 0),
-        projects_valid=project_cards_data.get("projects_valid", 0),
+        random_project_name=project_command_center_data.get("random_project_name", ""),
+        random_project_image_path=project_command_center_data.get("random_project_image_path", ""),
     )
 
 

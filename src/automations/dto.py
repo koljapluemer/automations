@@ -24,9 +24,8 @@ class DashboardDTO:
     focus: str = ""  # Weekly focus item
     repo_to_maintain: str = ""  # Daily repo to maintain
     progress_bars: list[dict[str, Any]] = field(default_factory=list)  # Progress to 100
-    project_card_image_path: str = ""  # Random project card image
-    projects_total: int = 0  # Total project notes in vault
-    projects_valid: int = 0  # Projects with valid 1920x1080 images
+    random_project_name: str = ""  # Random project name
+    random_project_image_path: str = ""  # Random project image path
 
     def to_dict(self) -> dict:
         """Convert to dict for Jinja2 template."""
@@ -56,9 +55,8 @@ class DashboardDTO:
             "focus": self.focus,
             "repo_to_maintain": self.repo_to_maintain,
             "progress_bars": self.progress_bars,
-            "project_card_image_path": self.project_card_image_path,
-            "projects_total": self.projects_total,
-            "projects_valid": self.projects_valid,
+            "random_project_name": self.random_project_name,
+            "random_project_image_path": self.random_project_image_path,
         }
 
     def _get_color(self, commit_count: int, max_commits: int) -> str:
