@@ -1,6 +1,6 @@
 # Project Command Center
 
-Scans all top-level folders in `git_project_folder`, integrates GitHub repo metadata, and collects structured project data for the dashboard.
+Scans all top-level folders in `git_project_folder`, integrates GitHub repo metadata, collects structured project data for the dashboard, and generates a project overview HTML page.
 
 ## What it does
 
@@ -14,9 +14,27 @@ If `vault_repo_folder` is configured, also writes Obsidian-style markdown notes 
 ### 2. Local scan
 For each repo dir that has a valid `doc/project.json`:
 1. **Validates** against `project_json_schema.json` (requires `id`, `name`, `description` strings)
-2. **Exports JSON** to `project_output_data_folder/$id.json` (as `{type, name, description, rows, cols}`)
+2. **Exports JSON** to `project_output_data_folder/$id.json` as `{type, name, description, rows, cols}`
 3. **Exports image** — finds the first local image in `README.md` (`![](path)` syntax), converts to WebP, saves as `project_data_output_img_folder/$id.webp`; repos without an image are excluded from the dashboard pool
 4. **Dashboard** — picks a random project with an image and surfaces `random_project_name` + `random_project_image_path`; also exposes `active_count` from GitHub for the stats panel
+
+### 3. Overview HTML
+Writes a browsable project overview to `project_overview_html` (if configured). Structure:
+
+- **Projects** — one collapsible card per project (defined by `doc/project.json`). Each card shows the project name and a tiny thumbnail when collapsed; expands to show the full image, description, and the list of associated repos.
+- **Repos without projects** — repos that have no `doc/project.json` and are not referenced by any `belongs_to.json`.
+
+#### Repo→project relationships
+A repo is associated with a project in two ways:
+- **Main repo**: the repo that contains the project's `doc/project.json` — always listed first under that project with role "main repo".
+- **`belongs_to.json`**: a repo can declare membership in one or more projects via `doc/belongs_to.json`, with project IDs as keys and a role description as value:
+  ```json
+  { "my-project": "runs the data transformation", "other-project": "provides the CMS" }
+  ```
+  Relationships are many-to-many — a repo can belong to multiple projects, a project can have multiple repos.
+
+#### Issues
+Each repo can have issues as markdown files in `doc/issues/*.md`. The first heading in each file is used as the issue name. These are **not** GitHub issues.
 
 ## Config keys
 
@@ -25,16 +43,17 @@ For each repo dir that has a valid `doc/project.json`:
 | `git_project_folder` | Root folder containing git repos as direct subdirectories |
 | `project_output_data_folder` | Where validated `$id.json` files are written |
 | `project_data_output_img_folder` | Where `$id.webp` images are written |
+| `project_overview_html` | *(optional)* Output path for the project overview HTML page |
 | `github_username` | GitHub username for API auth |
 | `github_token` | GitHub personal access token |
 | `vault_repo_folder` | *(optional)* Obsidian folder to write repo notes into |
+
+## Schema
+
+`project_json_schema.json` — JSON Schema (draft 2020-12). Required fields: `id`, `name`, `description` (all strings). Additional properties allowed.
 
 ## Force re-fetch
 
 ```bash
 uv run automations --force-github
 ```
-
-## Schema
-
-`project_json_schema.json` — JSON Schema (draft 2020-12). Required fields: `id`, `name`, `description` (all strings). Additional properties allowed.
