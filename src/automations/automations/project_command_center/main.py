@@ -9,10 +9,13 @@ from pathlib import Path
 from typing import Any
 
 import jsonschema
+from jinja2 import Environment, FileSystemLoader
 
 from ..base import Automation
 from ...context import AutomationContext
 from ...models import AutomationSpec
+
+HEADING_RE = re.compile(r"^#{1,6}\s+(.+)$", re.MULTILINE)
 
 _SCHEMA_PATH = Path(__file__).parent / "project_json_schema.json"
 _SCHEMA: dict[str, Any] = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -148,6 +151,18 @@ class ProjectCommandCenterAutomation(Automation):
 
         random_project = random.choice(projects_with_image) if projects_with_image else {}
 
+        # --- Overview HTML ---
+        overview_html_raw = shared.get("project_overview_html")
+        if overview_html_raw:
+            overview_path = Path(str(overview_html_raw)).expanduser()
+            if not overview_path.is_absolute():
+                overview_path = ctx.config.project_root / overview_path
+            try:
+                _generate_overview(git_project_folder, output_img_folder, overview_path)
+                ctx.log.append(self.spec.id, "overview", {"path": str(overview_path)})
+            except Exception as e:
+                ctx.log.append(self.spec.id, "overview_error", {"error": str(e)})
+
         ctx.log.append(self.spec.id, "result", {
             "projects_processed": processed,
             "projects_skipped": skipped,
@@ -165,6 +180,117 @@ class ProjectCommandCenterAutomation(Automation):
             "active_count": active_count,
             "count": total_count,
         }
+
+
+# --- Overview HTML ---
+
+def _generate_overview(git_project_folder: Path, output_img_folder: Path, output_path: Path) -> None:
+    # Pass 1: read all repo metadata
+    repo_meta: dict[str, dict[str, Any]] = {}
+    for repo_dir in sorted(git_project_folder.iterdir()):
+        if not repo_dir.is_dir():
+            continue
+
+        project: dict[str, Any] | None = None
+        doc_path = repo_dir / "doc" / "project.json"
+        if doc_path.exists():
+            try:
+                doc = json.loads(doc_path.read_text(encoding="utf-8"))
+                jsonschema.validate(doc, _SCHEMA)
+                project = doc
+            except Exception:
+                pass
+
+        belongs_to: dict[str, str] = {}
+        belongs_path = repo_dir / "doc" / "belongs_to.json"
+        if belongs_path.exists():
+            try:
+                raw = json.loads(belongs_path.read_text(encoding="utf-8"))
+                if isinstance(raw, dict):
+                    belongs_to = {k: str(v) for k, v in raw.items()}
+            except Exception:
+                pass
+
+        repo_meta[repo_dir.name] = {
+            "project": project,
+            "belongs_to": belongs_to,
+            "issues": _collect_issues(repo_dir),
+        }
+
+    # Pass 2: build project structures
+    # project_id → {id, name, description, image_path, repos[]}
+    # Also track which repo defines each project, to prepend it as "main repo"
+    projects: dict[str, dict[str, Any]] = {}
+    project_defining_repo: dict[str, str] = {}  # pid → repo_name
+    for repo_name, meta in repo_meta.items():
+        if meta["project"] is None:
+            continue
+        pid = meta["project"]["id"]
+        img = output_img_folder / f"{pid}.webp"
+        projects[pid] = {
+            "id": pid,
+            "name": meta["project"]["name"],
+            "description": meta["project"].get("description", ""),
+            "image_path": str(img) if img.exists() else "",
+            "repos": [],
+        }
+        project_defining_repo[pid] = repo_name
+
+    # Attach repos to projects via belongs_to
+    referenced: set[str] = set()
+    for repo_name, meta in repo_meta.items():
+        for pid, role in meta["belongs_to"].items():
+            if pid not in projects:
+                continue
+            projects[pid]["repos"].append({
+                "name": repo_name,
+                "role": role,
+                "issues": meta["issues"],
+            })
+            referenced.add(repo_name)
+
+    # Prepend the defining repo as "main repo" if not already listed
+    for pid, defining_repo in project_defining_repo.items():
+        already_listed = any(r["name"] == defining_repo for r in projects[pid]["repos"])
+        if not already_listed:
+            projects[pid]["repos"].insert(0, {
+                "name": defining_repo,
+                "role": "main repo",
+                "issues": repo_meta[defining_repo]["issues"],
+            })
+        referenced.add(defining_repo)
+
+    # Orphans: no project.json and not referenced in any belongs_to
+    orphans = [
+        {"name": name, "issues": meta["issues"]}
+        for name, meta in repo_meta.items()
+        if meta["project"] is None and name not in referenced
+    ]
+
+    env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)))
+    template = env.get_template("overview_template.html")
+    html = template.render(
+        projects=list(projects.values()),
+        orphans=orphans,
+        generated_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(html, encoding="utf-8")
+
+
+def _collect_issues(repo_dir: Path) -> list[str]:
+    issues_dir = repo_dir / "doc" / "issues"
+    if not issues_dir.is_dir():
+        return []
+    names = []
+    for md in sorted(issues_dir.glob("*.md")):
+        try:
+            content = md.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        match = HEADING_RE.search(content)
+        names.append(match.group(1).strip() if match else md.stem)
+    return names
 
 
 # --- GitHub scaffolding ---
