@@ -13,16 +13,6 @@ def build_parser() -> argparse.ArgumentParser:
         default="config.yaml",
         help="Config file name in project root (default: config.yaml)",
     )
-    parser.add_argument(
-        "--force-zk-deploy",
-        action="store_true",
-        help="Force zk portfolio deployment even if already run today",
-    )
-    parser.add_argument(
-        "--force-telegram-idea",
-        action="store_true",
-        help="Force telegram idea send even if already sent today",
-    )
     return parser
 
 
@@ -31,10 +21,6 @@ def main() -> int:
     args = parser.parse_args()
 
     force_flags: set[str] = set()
-    if args.force_zk_deploy:
-        force_flags.add("zk_deploy")
-    if args.force_telegram_idea:
-        force_flags.add("telegram_idea")
 
     config = load_config(filename=args.config)
     summary = run_automations(config, force_flags=frozenset(force_flags))

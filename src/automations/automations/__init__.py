@@ -1,31 +1,19 @@
 from .base import Automation
-from .daily_repo_maintain import DailyRepoMaintainAutomation
 from .git_commit_tracker import GitCommitTrackerAutomation
 from .obsidian_md_count import ObsidianMarkdownCountAutomation
 from .obsidian_edit_tracker import ObsidianEditTrackerAutomation
-from .progress_to_hundred import ProgressToHundredAutomation
-from .publish_portfolio_from_obs import PublishPortfolioFromObsAutomation
 from .random_art import RandomArtAutomation
 from .unedited_kindle_notes import UneditedKindleNotesAutomation
 from .wallpaper_from_report import WallpaperFromReportAutomation
-from .weekly_commit_tracker import WeeklyCommitTrackerAutomation
 from .project_command_center import ProjectCommandCenterAutomation
-from .telegram_idea import TelegramIdeaAutomation
-from .weekly_focus import WeeklyFocusAutomation
 
 __all__ = [
     "Automation",
-    "DailyRepoMaintainAutomation",
     "GitCommitTrackerAutomation",
     "ObsidianMarkdownCountAutomation",
     "ObsidianEditTrackerAutomation",
     "ProjectCommandCenterAutomation",
-    "ProgressToHundredAutomation",
-    "PublishPortfolioFromObsAutomation",
     "RandomArtAutomation",
-    "TelegramIdeaAutomation",
     "UneditedKindleNotesAutomation",
     "WallpaperFromReportAutomation",
-    "WeeklyCommitTrackerAutomation",
-    "WeeklyFocusAutomation",
 ]

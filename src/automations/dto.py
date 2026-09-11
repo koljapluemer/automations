@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
 
 
 @dataclass
@@ -12,18 +11,8 @@ class DashboardDTO:
     generated_at: datetime
     artwork_image_path: str
     artwork_filename: str
-    active_repos: int
-    vault_notes: int
-    zk_percentage: float
-    leaf_percentage: float
     commit_heatmap: list[int]  # 14 days of commit counts
     obs_edits_heatmap: list[int]  # 14 days of obsidian edit counts
-    weekly_portfolio_commit: bool  # Portfolio repo committed this week
-    weekly_main_commit: bool  # Main repo committed this week
-    location_count: int = 0  # Unedited Kindle notes (location: occurrences)
-    focus: str = ""  # Weekly focus item
-    repo_to_maintain: str = ""  # Daily repo to maintain
-    progress_bars: list[dict[str, Any]] = field(default_factory=list)  # Progress to 100
     random_project_name: str = ""  # Random project name
     random_project_image_path: str = ""  # Random project image path
 
@@ -41,20 +30,10 @@ class DashboardDTO:
             "generated_at": self.generated_at.strftime("%Y-%m-%d %H:%M"),
             "artwork_image_path": self.artwork_image_path,
             "artwork_filename": self.artwork_filename,
-            "active_repos": self.active_repos,
-            "vault_notes": self.vault_notes,
-            "zk_percentage": f"{self.zk_percentage:.1f}%",
-            "leaf_percentage": f"{self.leaf_percentage:.1f}%",
-            "location_count": self.location_count,
             "commit_heatmap": self.commit_heatmap,
             "heatmap_colors": heatmap_colors,
             "obs_edits_heatmap": self.obs_edits_heatmap,
             "obs_edits_colors": obs_edits_colors,
-            "weekly_portfolio_commit": "✓" if self.weekly_portfolio_commit else "",
-            "weekly_main_commit": "✓" if self.weekly_main_commit else "",
-            "focus": self.focus,
-            "repo_to_maintain": self.repo_to_maintain,
-            "progress_bars": self.progress_bars,
             "random_project_name": self.random_project_name,
             "random_project_image_path": self.random_project_image_path,
         }

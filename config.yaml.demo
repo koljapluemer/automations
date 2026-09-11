@@ -17,14 +17,6 @@ wallpaper_output_image: "output/wallpaper.png"
 project_cards_output_folder: "output/project_cards"
 project_cards_html_output: "output/project_cards_html"
 
-weekly_focus_file: "~/path/to/focus.txt"
-
-telegram_idea_files:
-  - "~/path/to/ideas1.txt"
-  - "~/path/to/ideas2.txt"
-
-progress_to_hundred_path: "~/path/to/progress-folder"
-
 git_project_folder: "~/path/to/git-projects"
 project_output_data_folder: "output/project_command_center/data"
 project_data_output_img_folder: "output/project_command_center/img"

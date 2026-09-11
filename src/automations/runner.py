@@ -143,14 +143,8 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
 
     # Extract data from specific automations with fallbacks
     git_data = data_map.get("git_commit_tracker", {})
-    obsidian_data = data_map.get("obsidian_md_count", {})
     art_data = data_map.get("random_art", {})
     obs_edits_data = data_map.get("obsidian_edit_tracker", {})
-    weekly_commit_data = data_map.get("weekly_commit_tracker", {})
-    kindle_data = data_map.get("unedited_kindle_notes", {})
-    weekly_focus_data = data_map.get("weekly_focus", {})
-    daily_repo_data = data_map.get("daily_repo_maintain", {})
-    progress_data = data_map.get("progress_to_hundred", {})
     project_command_center_data = data_map.get("project_command_center", {})
 
     # Convert daily_commits dict to list of 14 counts
@@ -173,18 +167,8 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         generated_at=generated_at,
         artwork_image_path=art_data.get("image_path", ""),
         artwork_filename=art_data.get("image_name", "N/A"),
-        active_repos=project_command_center_data.get("local_repo_count", 0),
-        vault_notes=obsidian_data.get("count", 0),
-        zk_percentage=obsidian_data.get("zk_percentage", 0.0),
-        leaf_percentage=obsidian_data.get("leaf_percentage", 0.0),
-        location_count=kindle_data.get("count", 0),
         commit_heatmap=commit_heatmap,
         obs_edits_heatmap=obs_edits_heatmap,
-        weekly_portfolio_commit=weekly_commit_data.get("portfolio_has_commits", False),
-        weekly_main_commit=weekly_commit_data.get("main_has_commits", False),
-        focus=weekly_focus_data.get("focus", ""),
-        repo_to_maintain=daily_repo_data.get("repo", ""),
-        progress_bars=progress_data.get("bars", []),
         random_project_name=project_command_center_data.get("random_project_name", ""),
         random_project_image_path=project_command_center_data.get("random_project_image_path", ""),
     )
