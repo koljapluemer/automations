@@ -146,6 +146,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
     art_data = data_map.get("random_art", {})
     obs_edits_data = data_map.get("obsidian_edit_tracker", {})
     project_command_center_data = data_map.get("project_command_center", {})
+    blog_display_data = data_map.get("blog_display", {})
 
     # Convert daily_commits dict to list of 14 counts
     daily_commits = git_data.get("daily_commits", {})
@@ -170,7 +171,7 @@ def _build_dto(results: list[AutomationResult], generated_at: datetime) -> Dashb
         commit_heatmap=commit_heatmap,
         obs_edits_heatmap=obs_edits_heatmap,
         random_project_name=project_command_center_data.get("random_project_name", ""),
-        random_project_image_path=project_command_center_data.get("random_project_image_path", ""),
+        blog_html_path=blog_display_data.get("blog_html_path", ""),
     )
 
 

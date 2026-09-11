@@ -14,7 +14,7 @@ class DashboardDTO:
     commit_heatmap: list[int]  # 14 days of commit counts
     obs_edits_heatmap: list[int]  # 14 days of obsidian edit counts
     random_project_name: str = ""  # Random project name
-    random_project_image_path: str = ""  # Random project image path
+    blog_html_path: str = ""  # Random blog post HTML path
 
     def to_dict(self) -> dict:
         """Convert to dict for Jinja2 template."""
@@ -35,7 +35,7 @@ class DashboardDTO:
             "obs_edits_heatmap": self.obs_edits_heatmap,
             "obs_edits_colors": obs_edits_colors,
             "random_project_name": self.random_project_name,
-            "random_project_image_path": self.random_project_image_path,
+            "blog_html_path": self.blog_html_path,
         }
 
     def _get_color(self, commit_count: int, max_commits: int) -> str:

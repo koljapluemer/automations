@@ -18,6 +18,7 @@ project_cards_output_folder: "output/project_cards"
 project_cards_html_output: "output/project_cards_html"
 
 git_project_folder: "~/path/to/git-projects"
+blog_folder: "~/path/to/blog-output"
 project_output_data_folder: "output/project_command_center/data"
 project_data_output_img_folder: "output/project_command_center/img"
 project_overview_html: "output/project_command_center/overview.html"
