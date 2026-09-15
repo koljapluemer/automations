@@ -1,0 +1,2 @@
+- Do not do "visual" checks
+- Do not run commands or load files outside the repo folder except if you have VERY explicity permission

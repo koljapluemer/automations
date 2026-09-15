@@ -95,6 +95,13 @@
             height: 20px;
         }
 
+        .graphirst-stats-image {
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            margin-top: 32px;
+        }
+
         /* Fourth Column */
         .blog-column {
             max-height: 100%;
@@ -148,10 +155,16 @@
                     </div>
                 </div>
             </div>
+
+            {% if graphirst_stats_image_path %}
+            <img src="file://{{ graphirst_stats_image_path }}"
+                 alt="Graphirst stats"
+                 class="graphirst-stats-image">
+            {% endif %}
         </div>
 
 
-  
+
 
         <!-- Fourth Column: Blog Post -->
         {% if blog_html_path %}

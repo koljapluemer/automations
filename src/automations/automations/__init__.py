@@ -1,6 +1,7 @@
 from .base import Automation
 from .blog_display import BlogDisplayAutomation
 from .git_commit_tracker import GitCommitTrackerAutomation
+from .graphirst_stats import GraphirstStatsAutomation
 from .obsidian_md_count import ObsidianMarkdownCountAutomation
 from .obsidian_edit_tracker import ObsidianEditTrackerAutomation
 from .random_art import RandomArtAutomation
@@ -12,6 +13,7 @@ __all__ = [
     "Automation",
     "BlogDisplayAutomation",
     "GitCommitTrackerAutomation",
+    "GraphirstStatsAutomation",
     "ObsidianMarkdownCountAutomation",
     "ObsidianEditTrackerAutomation",
     "ProjectCommandCenterAutomation",

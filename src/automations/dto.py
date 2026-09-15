@@ -15,6 +15,7 @@ class DashboardDTO:
     obs_edits_heatmap: list[int]  # 14 days of obsidian edit counts
     random_project_name: str = ""  # Random project name
     blog_html_path: str = ""  # Random blog post HTML path
+    graphirst_stats_image_path: str = ""  # Path to rendered graphirst stats chart
 
     def to_dict(self) -> dict:
         """Convert to dict for Jinja2 template."""
@@ -36,6 +37,7 @@ class DashboardDTO:
             "obs_edits_colors": obs_edits_colors,
             "random_project_name": self.random_project_name,
             "blog_html_path": self.blog_html_path,
+            "graphirst_stats_image_path": self.graphirst_stats_image_path,
         }
 
     def _get_color(self, commit_count: int, max_commits: int) -> str:

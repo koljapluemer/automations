@@ -4,6 +4,9 @@ github_token: "ghp_yourtoken"
 
 vault_path: "/home/you/obsidian-vault"
 vault_media_path: "/home/you/obsidian-vault/media"
+
+graphirst_settings_path: "~/.config/graphirst-settings.json"
+graphirst_stats_output_image: "output/graphirst_stats.png"
 essay_include_string: "tags: essay"
 essay_output_folder: "output/essays"
 essay_media_folder: "output/essays/media"
